@@ -125,6 +125,9 @@ export const logoutUser = async (): Promise<void> => {
 export const isAuthenticated = (): boolean => {
   const token = tokenManager.getToken();
   const user = tokenManager.getUser();
+  
+  console.log('isAuthenticated check - token:', !!token, 'user:', !!user);
+  
   return !!(token && user);
 };
 

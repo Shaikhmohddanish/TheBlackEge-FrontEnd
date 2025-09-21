@@ -23,6 +23,9 @@ interface User {
   imageUrl?: string;
   enabled: boolean;
   roles: string[];
+  // Computed properties for convenience
+  firstName?: string;
+  lastName?: string;
 }
 
 interface AuthContextType {
@@ -48,34 +51,69 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper function to split name into firstName and lastName
+  const processUserData = (userData: any): User => {
+    const nameParts = userData.name ? userData.name.split(' ') : ['', ''];
+    return {
+      ...userData,
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
+    };
+  };
+
   useEffect(() => {
     // Check if user is authenticated on mount
     const checkAuth = () => {
       try {
-        if (isAuthenticated()) {
-          const currentUser = getCurrentUser();
-          setUser(currentUser);
+        console.log('AuthProvider: Checking authentication on mount...');
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+        
+        console.log('AuthProvider: Token exists:', !!token);
+        console.log('AuthProvider: User exists:', !!storedUser);
+        
+        if (token && storedUser) {
+          try {
+            const currentUser = JSON.parse(storedUser);
+            console.log('AuthProvider: Setting user from storage:', currentUser);
+            setUser(processUserData(currentUser));
+          } catch (parseError) {
+            console.error('AuthProvider: Failed to parse stored user:', parseError);
+            setUser(null);
+          }
+        } else {
+          console.log('AuthProvider: No stored auth data found');
+          setUser(null);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        // Clear invalid tokens
-        localStorage.clear();
+        console.error('AuthProvider: Auth check failed:', error);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
+    // Add a small delay to ensure localStorage is ready
+    setTimeout(checkAuth, 100);
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
       setIsLoading(true);
+      console.log('Auth context: Starting login');
       const response = await loginUser(credentials);
-      setUser(response.user);
+      console.log('Auth context: Login API response received');
+      
+      if (response.success && response.user) {
+        const userData = processUserData(response.user);
+        console.log('Auth context: Setting user data', userData);
+        setUser(userData);
+      }
+      
       return response;
     } catch (error) {
       console.error('Login failed:', error);
+      setUser(null);
       throw error;
     } finally {
       setIsLoading(false);
@@ -86,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await registerUser(userData);
-      setUser(response.user);
+      setUser(processUserData(response.user));
       return response;
     } catch (error) {
       console.error('Registration failed:', error);
@@ -113,8 +151,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const googleLogin = async (googleData: GoogleAuthData): Promise<AuthResponse> => {
     try {
       setIsLoading(true);
+      console.log('Google login starting...');
       const response = await loginWithGoogle(googleData);
-      setUser(response.user);
+      console.log('Google login response:', response);
+      setUser(processUserData(response.user));
+      console.log('User set in context:', processUserData(response.user));
       return response;
     } catch (error) {
       console.error('Google login failed:', error);
@@ -128,7 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await registerWithGoogle(googleData);
-      setUser(response.user);
+      setUser(processUserData(response.user));
       return response;
     } catch (error) {
       console.error('Google registration failed:', error);
@@ -145,8 +186,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     isLoading,
-    isAuthenticated: !!user,
-    isAdmin: isAdmin(),
+    isAuthenticated: !!user && !isLoading, // Only consider authenticated if we have user and not loading
+    isAdmin: !!user && !isLoading && isAdmin(), // Only check admin status if we have user and not loading
     login,
     register,
     loginWithGoogle: googleLogin,

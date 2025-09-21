@@ -31,7 +31,7 @@ export function Header() {
   const { getTotalItems: getWishlistItems } = useWishlist()
   const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
-  const { toast } = useToast()
+  const { toast, dismiss } = useToast()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,14 +44,25 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
+      console.log('Starting logout process...')
       await logout()
+      console.log('Logout successful, showing toast and redirecting...')
+      
+      // Show success toast (it will auto-dismiss after 3 seconds due to TOAST_REMOVE_DELAY)
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
       })
+      
+      // Use proper Next.js router for navigation with replace to prevent back navigation
+      setTimeout(() => {
+        router.replace('/login')
+      }, 500) // Small delay to show toast briefly before redirect
+      
     } catch (error) {
+      console.error('Logout error:', error)
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to logout. Please try again.",
         variant: "destructive",
       })
@@ -76,11 +87,8 @@ export function Header() {
             <Link href="/shop" className="text-foreground hover:text-primary transition-colors">
               Shop
             </Link>
-            <Link href="/collections" className="text-foreground hover:text-primary transition-colors">
-              Collections
-            </Link>
-            <Link href="/favorites" className="text-foreground hover:text-primary transition-colors">
-              Favorites
+            <Link href="/wishlist" className="text-foreground hover:text-primary transition-colors">
+              Wishlist
             </Link>
             <Link href="/track" className="text-foreground hover:text-primary transition-colors">
               Track Order
@@ -137,7 +145,7 @@ export function Header() {
                     <Icons.shoppingCart className="mr-2 h-4 w-4" />
                     Orders
                   </DropdownMenuItem>
-                  {user?.role === 'ADMIN' && (
+                  {user?.roles?.includes('ADMIN') && (
                     <DropdownMenuItem onClick={() => router.push('/admin')}>
                       <Icons.user className="mr-2 h-4 w-4" />
                       Admin Dashboard
@@ -203,8 +211,8 @@ export function Header() {
               <Link href="/shop" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Shop
               </Link>
-              <Link href="/collections" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                Collections
+              <Link href="/wishlist" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Wishlist
               </Link>
               <Link href="/track" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Track Order

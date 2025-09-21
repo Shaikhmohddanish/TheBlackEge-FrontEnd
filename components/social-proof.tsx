@@ -75,21 +75,27 @@ export function SocialProof() {
       handle: "@komalpandeyofficial",
       followers: "1.8M",
       quote: "Obsessed with my new THE BLACKEGE collection! 🖤",
-      platform: "Instagram"
+      platform: "Instagram",
+      likes: "42K",
+      comments: "3K"
     },
     {
       name: "Masoom Minawala",
       handle: "@masoomminawala",
       followers: "1.2M", 
       quote: "Perfect streetwear vibes for every mood ✨",
-      platform: "Instagram"
+      platform: "Instagram",
+      likes: "38K",
+      comments: "2K"
     },
     {
       name: "Aashna Shroff",
       handle: "@aashnashroff",
       followers: "950K",
       quote: "Quality that speaks for itself 👌",
-      platform: "Instagram"
+      platform: "Instagram",
+      likes: "45K",
+      comments: "4K"
     }
   ];
 
@@ -122,7 +128,6 @@ export function SocialProof() {
                     width={48}
                     height={48}
                     className="rounded-full object-cover mr-3"
-                    fallback="/placeholder.jpg"
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -232,11 +237,11 @@ export function SocialProof() {
                     <div className="flex justify-center items-center gap-4 mt-6 pt-4 border-t border-white/20">
                       <div className="flex items-center gap-1 text-xs text-white/60">
                         <Icons.heart className="h-3 w-3 text-red-400 fill-current" />
-                        <span>{Math.floor(Math.random() * 50 + 20)}K</span>
+                        <span>{influencer.likes}</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-white/60">
                         <Icons.messageCircle className="h-3 w-3" />
-                        <span>{Math.floor(Math.random() * 5 + 1)}K</span>
+                        <span>{influencer.comments}</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-white/60">
                         <Icons.star className="h-3 w-3 text-yellow-400 fill-current" />

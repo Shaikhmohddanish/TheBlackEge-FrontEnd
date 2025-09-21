@@ -1,7 +1,7 @@
 'use client';
 
 import { Header } from "@/components/header"
-import { EnhancedShopContent } from "@/components/enhanced-shop-content"
+import { EnhancedShopContentInfinite } from "@/components/enhanced-shop-content-infinite"
 import { Footer } from "@/components/footer"
 
 export default function ShopPage() {
@@ -9,7 +9,7 @@ export default function ShopPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main>
-        <EnhancedShopContent />
+        <EnhancedShopContentInfinite />
       </main>
       <Footer />
     </div>

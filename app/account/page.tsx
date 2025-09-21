@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,12 +17,11 @@ import { getUserOrders } from '@/lib/api/orders';
 import { trackOrderById, type OrderTracking } from '@/lib/api/tracking';
 import { TrackingStatusBadge } from '@/components/tracking/status-badge';
 import { Icons } from '@/components/ui/icons';
-import { useEffect } from 'react';
 import type { Order } from '@/lib/api/orders';
 import { PasswordChangeForm } from '@/components/auth/password-change-form';
 
 export default function AccountPage() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderTracking, setOrderTracking] = useState<Record<string, OrderTracking>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,11 @@ export default function AccountPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Wait for auth loading to complete before checking authentication
+    if (authLoading) {
+      return;
+    }
+    
     if (!isAuthenticated) {
       router.push('/login');
       return;
@@ -52,7 +58,7 @@ export default function AccountPage() {
     };
 
     fetchOrders();
-  }, [isAuthenticated, router, toast]);
+  }, [isAuthenticated, authLoading, router, toast]);
 
   const loadOrderTracking = async (orderId: string) => {
     if (orderTracking[orderId] || trackingLoading[orderId]) return;
@@ -109,21 +115,23 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Account</h1>
-        <p className="text-gray-600">Manage your account and view your orders</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-16 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">My Account</h1>
+          <p className="text-gray-600">Manage your account and view your orders</p>
+        </div>
 
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="profile" className="mt-6">
+          <TabsContent value="profile" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
@@ -152,21 +160,21 @@ export default function AccountPage() {
               </div>
               <div className="space-y-2">
                 <Label>Role</Label>
-                <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-                  {user.role}
+                <Badge variant={user.roles?.includes('ROLE_ADMIN') ? 'default' : 'secondary'}>
+                  {user.roles?.includes('ROLE_ADMIN') ? 'ADMIN' : 'USER'}
                 </Badge>
               </div>
               <div className="space-y-2">
-                <Label>Account Status</Label>
-                <Badge variant={user.isActive ? 'default' : 'destructive'}>
-                  {user.isActive ? 'Active' : 'Inactive'}
+                <Label>Status</Label>
+                <Badge variant={user.enabled ? 'default' : 'destructive'}>
+                  {user.enabled ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="orders" className="mt-6">
+          <TabsContent value="orders" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Order History</CardTitle>
@@ -300,13 +308,21 @@ export default function AccountPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="security" className="mt-6">
-          <div className="max-w-md">
-            <PasswordChangeForm />
-          </div>
-        </TabsContent>
+                  <TabsContent value="security" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Settings</CardTitle>
+                <CardDescription>
+                  Manage your password and account security
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PasswordChangeForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
+          <TabsContent value="settings" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Account Settings</CardTitle>
@@ -326,8 +342,10 @@ export default function AccountPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+        </Tabs>
+      </main>
+      <Footer />
     </div>
   );
 }

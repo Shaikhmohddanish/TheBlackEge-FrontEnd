@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Icons } from '@/components/ui/icons';
 import { useToast } from '@/hooks/use-toast';
+import { submitContactForm } from '@/lib/api/contact';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -43,23 +44,43 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: 'Message sent!',
-        description: 'Thank you for reaching out. We\'ll get back to you within 24 hours.',
-      });
+      // Validate required fields
+      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        toast({
+          title: 'Validation Error',
+          description: 'Please fill in all required fields.',
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        category: '',
-        message: '',
-      });
+      // Submit to backend API
+      const response = await submitContactForm(formData);
+      
+      if (response.success) {
+        toast({
+          title: 'Message sent!',
+          description: 'Thank you for reaching out. We\'ll get back to you within 24 hours.',
+        });
+
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          category: '',
+          message: '',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: response.message || 'Failed to send message. Please try again.',
+          variant: 'destructive',
+        });
+      }
     } catch (error) {
+      console.error('Contact form error:', error);
       toast({
         title: 'Error',
         description: 'Failed to send message. Please try again.',
@@ -111,7 +132,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-white hover:text-white">
       <Header />
       
       <main>
@@ -254,15 +275,15 @@ export default function ContactPage() {
                       Stay connected with THE BLACKEGE community
                     </p>
                     <div className="flex space-x-4">
-                      <Button variant="outline" size="sm">
-                        <Icons.user className="h-4 w-4 mr-2" />
+                      <Button variant="outline" size="sm" className="text-white hover:text-white">
+                        <Icons.instagram className="h-4 w-4 mr-2" />
                         Instagram
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="text-white hover:text-white">
                         <Icons.user className="h-4 w-4 mr-2" />
                         Twitter
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="text-white hover:text-white">
                         <Icons.user className="h-4 w-4 mr-2" />
                         TikTok
                       </Button>
@@ -299,7 +320,7 @@ export default function ContactPage() {
               <p className="text-muted-foreground mb-4">
                 Don't see your question answered?
               </p>
-              <Button variant="outline">
+              <Button variant="outline" className='text-white hover:text-white'>
                 View Full FAQ
               </Button>
             </div>
@@ -368,7 +389,7 @@ export default function ContactPage() {
                       24/7 automated processing
                     </p>
                   </div>
-                  <Button className="w-full" variant="outline">
+                  <Button className="w-full text-white hover:text-white" variant="outline">
                     Start Live Chat
                   </Button>
                 </CardContent>

@@ -151,7 +151,7 @@ export function EnhancedProductDetail({ product }: EnhancedProductDetailProps) {
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
             <p className="text-gray-600 mb-4">{product.category}</p>
             
             <div className="flex items-center space-x-4 mb-4">
@@ -168,7 +168,7 @@ export function EnhancedProductDetail({ product }: EnhancedProductDetailProps) {
                   </Badge>
                 </>
               ) : (
-                <span className="text-2xl font-bold text-gray-900">
+                <span className="text-2xl font-bold text-white">
                   {formatPrice(product.price)}
                 </span>
               )}
@@ -254,22 +254,22 @@ export function EnhancedProductDetail({ product }: EnhancedProductDetailProps) {
                 <CardContent className="pt-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium text-gray-900">SKU</h4>
+                      <h4 className="font-medium text-white">SKU</h4>
                       <p className="text-gray-600">{product.sku}</p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Category</h4>
+                      <h4 className="font-medium text-white">Category</h4>
                       <p className="text-gray-600">{product.category}</p>
                     </div>
                     {product.weight && (
                       <div>
-                        <h4 className="font-medium text-gray-900">Weight</h4>
+                        <h4 className="font-medium text-white">Weight</h4>
                         <p className="text-gray-600">{product.weight}g</p>
                       </div>
                     )}
                     {product.dimensions && (
                       <div>
-                        <h4 className="font-medium text-gray-900">Dimensions</h4>
+                        <h4 className="font-medium text-white">Dimensions</h4>
                         <p className="text-gray-600">{product.dimensions}</p>
                       </div>
                     )}

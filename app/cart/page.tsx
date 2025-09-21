@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,7 +17,7 @@ import { formatPrice } from '@/lib/currency-utils';
 
 export default function CartPage() {
   const { cart, isLoading, updateItem, removeItem, clearCart, getTotalItems, getTotalAmount } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -68,6 +70,9 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
+    if (authLoading) {
+      return; // Wait for auth loading to complete
+    }
     if (!isAuthenticated) {
       router.push('/login?redirect=/checkout');
     } else {
@@ -75,12 +80,23 @@ export default function CartPage() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center py-12">
+          <Icons.spinner className="mx-auto h-8 w-8 animate-spin text-gray-400 mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center py-12">
           <Icons.shoppingCart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Your Cart</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Your Cart</h1>
           <p className="text-gray-600 mb-6">Please sign in to view your cart</p>
           <Button onClick={() => router.push('/login')}>
             Sign In
@@ -106,7 +122,7 @@ export default function CartPage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center py-12">
           <Icons.shoppingCart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Your Cart is Empty</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Your Cart is Empty</h1>
           <p className="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet</p>
           <Button onClick={() => router.push('/shop')}>
             Continue Shopping
@@ -117,9 +133,11 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-16 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Shopping Cart</h1>
         <p className="text-gray-600">{getTotalItems()} items in your cart</p>
       </div>
 
@@ -146,7 +164,7 @@ export default function CartPage() {
                   <div className="flex items-center space-x-4 flex-grow">
                     <div className="flex-shrink-0">
                       <Image
-                        src={item.imageUrl || '/placeholder.jpg'}
+                        src={item.productImageUrl || '/placeholder.jpg'}
                         alt={item.productName}
                         width={80}
                         height={80}
@@ -155,7 +173,7 @@ export default function CartPage() {
                     </div>
                     
                     <div className="flex-grow min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">
+                      <h3 className="font-medium text-white truncate">
                         <Link
                           href={`/product/${item.productId}`}
                           className="hover:text-blue-600"
@@ -166,7 +184,7 @@ export default function CartPage() {
                       {item.variantName && (
                         <p className="text-sm text-gray-600">{item.variantName}</p>
                       )}
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-white">
                         {formatPrice(item.price)}
                       </p>
                     </div>
@@ -193,8 +211,8 @@ export default function CartPage() {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                      <p className="font-medium text-gray-900">
-                        {formatPrice(item.total)}
+                      <p className="font-medium text-white">
+                        {formatPrice(item.price * item.quantity)}
                       </p>
                       <Button
                         variant="ghost"
@@ -265,6 +283,8 @@ export default function CartPage() {
           </Card>
         </div>
       </div>
+      </main>
+      <Footer />
     </div>
   );
 }

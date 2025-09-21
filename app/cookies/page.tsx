@@ -247,10 +247,10 @@ export default function CookiePolicyPage() {
                   <Button onClick={acceptAllCookies}>
                     Accept All Cookies
                   </Button>
-                  <Button variant="outline" onClick={rejectAllOptional}>
+                  <Button variant="outline" className="text-white hover:text-white" onClick={rejectAllOptional}>
                     Reject Optional Cookies
                   </Button>
-                  <Button variant="outline" onClick={saveSettings}>
+                  <Button variant="outline" className="text-white hover:text-white" onClick={saveSettings}>
                     Save Preferences
                   </Button>
                 </div>
@@ -632,7 +632,7 @@ export default function CookiePolicyPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                      <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                         <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
                           <Icons.shoppingCart className="h-6 w-6" />
                           <span className="font-medium">Google Privacy Policy</span>
@@ -640,7 +640,7 @@ export default function CookiePolicyPage() {
                         </a>
                       </Button>
                       
-                      <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                      <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                         <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer">
                           <Icons.shoppingCart className="h-6 w-6" />
                           <span className="font-medium">Facebook Privacy Policy</span>
@@ -648,7 +648,7 @@ export default function CookiePolicyPage() {
                         </a>
                       </Button>
                       
-                      <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                      <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                         <a href="https://www.hotjar.com/legal/policies/privacy/" target="_blank" rel="noopener noreferrer">
                           <Icons.shoppingCart className="h-6 w-6" />
                           <span className="font-medium">Hotjar Privacy Policy</span>
@@ -675,7 +675,7 @@ export default function CookiePolicyPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                   <a href="mailto:privacy@theblackege.com">
                     <Icons.user className="h-6 w-6" />
                     <span className="font-medium">Privacy Team</span>
@@ -683,7 +683,7 @@ export default function CookiePolicyPage() {
                   </a>
                 </Button>
                 
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                   <Link href="/contact">
                     <Icons.user className="h-6 w-6" />
                     <span className="font-medium">Contact Support</span>
@@ -691,7 +691,7 @@ export default function CookiePolicyPage() {
                   </Link>
                 </Button>
                 
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
+                <Button variant="outline" className="text-white hover:text-white" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
                   <Link href="/privacy">
                     <Icons.shoppingCart className="h-6 w-6" />
                     <span className="font-medium">Privacy Policy</span>

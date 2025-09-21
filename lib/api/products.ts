@@ -6,6 +6,7 @@ const transformProduct = (backendProduct: any): Product => {
   return {
     id: backendProduct.id?.toString() || '',
     name: backendProduct.name || '',
+    slug: backendProduct.slug || '',
     description: backendProduct.description || '',
     price: backendProduct.price || 0,
     stockQuantity: backendProduct.stockQuantity || 0,
@@ -17,8 +18,10 @@ const transformProduct = (backendProduct: any): Product => {
       ...m,
       url: m.filePath || m.url,
     })) || [],
-    categories: Array.from(backendProduct.categories || []),
-    category: Array.from(backendProduct.categories || [])[0] || '',
+    categories: Array.isArray(backendProduct.categories) ? Array.from(backendProduct.categories) : [],
+    category: Array.isArray(backendProduct.categories) && backendProduct.categories.length > 0 
+      ? backendProduct.categories[0].toString() 
+      : '',
     createdAt: backendProduct.createdAt,
     createdBy: backendProduct.createdBy,
     updatedAt: backendProduct.updatedAt,
@@ -29,6 +32,7 @@ const transformProduct = (backendProduct: any): Product => {
 export interface Product {
   id: string;
   name: string;
+  slug?: string; // SEO-friendly URL slug
   description: string;
   price: number;
   stockQuantity?: number;
@@ -106,22 +110,62 @@ export const getProducts = async (
     if (cached) return cached;
 
     const url = `${API_BASE_URL}/products?paginated=true&page=${page}&size=${size}&sortBy=${sort}&sortDir=${direction}`;
-    const response = await fetch(url);
-    const data = await handleAPIResponse(response);
+    
+    // Add timeout to prevent long waits when backend is down
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    try {
+      const response = await fetch(url, { 
+        signal: controller.signal 
+      });
+      
+      clearTimeout(timeoutId);
+      const data = await handleAPIResponse(response);
 
-    const result = {
-      products: (data.content || []).map(transformProduct),
-      totalPages: data.totalPages || 0,
-      totalElements: data.totalElements || 0,
-      currentPage: data.number || 0,
-      size: data.size || 0,
-    };
+      const result = {
+        products: (data.content || []).map(transformProduct),
+        totalPages: data.totalPages || 0,
+        totalElements: data.totalElements || 0,
+        currentPage: data.number || 0,
+        size: data.size || 0,
+      };
 
-    apiCache.set(cacheKey, result);
-    return result;
+      apiCache.set(cacheKey, result);
+      return result;
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      // If backend is not running, return empty result instead of throwing
+      if (
+        typeof fetchError === 'object' && 
+        fetchError !== null && 
+        (
+          (('name' in fetchError) && (fetchError as Error).name === 'AbortError') ||
+          (('message' in fetchError) && typeof (fetchError as Error).message === 'string' && 
+           (fetchError as Error).message.includes('fetch'))
+        )
+      ) {
+        console.log('Backend connection timed out or failed, returning empty results');
+        return {
+          products: [],
+          totalPages: 0,
+          totalElements: 0,
+          currentPage: 0,
+          size: 0,
+        };
+      }
+      throw fetchError;
+    }
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    throw error;
+    // Return empty results for any error to avoid breaking the UI
+    return {
+      products: [],
+      totalPages: 0,
+      totalElements: 0,
+      currentPage: 0,
+      size: 0,
+    };
   }
 };
 
@@ -140,6 +184,25 @@ export const getProduct = async (productId: string): Promise<Product> => {
     return transformedProduct;
   } catch (error) {
     console.error('Failed to fetch product:', error);
+    throw error;
+  }
+};
+
+// Get Product by Slug
+export const getProductBySlug = async (slug: string): Promise<Product> => {
+  try {
+    const cacheKey = `product_slug_${slug}`;
+    const cached = apiCache.get(cacheKey);
+    if (cached) return cached;
+
+    const response = await fetch(`${API_BASE_URL}/products/slug/${slug}`);
+    const product = await handleAPIResponse(response);
+
+    const transformedProduct = transformProduct(product);
+    apiCache.set(cacheKey, transformedProduct);
+    return transformedProduct;
+  } catch (error) {
+    console.error('Failed to fetch product by slug:', error);
     throw error;
   }
 };

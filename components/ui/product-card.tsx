@@ -8,8 +8,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/ui/icons';
 import { QuickViewModal } from '@/components/ui/quick-view-modal';
+import { QuickWishlistButton } from '@/components/ui/wishlist-button';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/currency-utils';
+import { getProductUrl } from '@/lib/utils/product-urls';
+import { getProductImageUrls, getCloudinaryUrl } from '@/lib/utils/cloudinary';
 
 interface ProductImage {
   url: string;
@@ -19,6 +22,7 @@ interface ProductImage {
 interface Product {
   id: string | number;
   name: string;
+  slug?: string; // SEO-friendly URL slug
   description?: string;
   price: number;
   salePrice?: number;
@@ -27,6 +31,8 @@ interface Product {
   inventory?: number;
   images?: ProductImage[] | string[]; // Support both formats
   image?: string; // Fallback single image
+  primaryImageId?: string; // Cloudinary public ID
+  galleryImageIds?: string[]; // Cloudinary public IDs
   sizes?: string[];
   colors?: string[];
   tags?: string[];
@@ -38,6 +44,7 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
+  userId?: string; // Add userId for wishlist functionality
   onAddToCart?: (product: Product, options?: { size?: string; color?: string; quantity?: number }) => void;
   onAddToWishlist?: (product: Product) => void;
   onBuyNow?: (product: Product, options?: { size?: string; color?: string; quantity?: number }) => void;
@@ -46,10 +53,12 @@ interface ProductCardProps {
   size?: 'sm' | 'md' | 'lg';
   showQuickView?: boolean;
   showBuyNow?: boolean;
+  showWishlist?: boolean; // Add option to show/hide wishlist button
 }
 
 export function ProductCard({
   product,
+  userId,
   onAddToCart,
   onAddToWishlist,
   onBuyNow,
@@ -58,13 +67,27 @@ export function ProductCard({
   size = 'md',
   showQuickView = true,
   showBuyNow = true,
+  showWishlist = true,
 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Normalize images to consistent format
+  // Normalize images to consistent format with Cloudinary support
   const images = React.useMemo(() => {
+    // If we have Cloudinary public IDs, use them
+    if (product.primaryImageId) {
+      const cloudinaryUrls = getProductImageUrls(product.primaryImageId);
+      return [{ url: cloudinaryUrls.card, alt: product.name }];
+    }
+    
+    // If we have gallery image IDs, use the first one
+    if (product.galleryImageIds && product.galleryImageIds.length > 0) {
+      const cloudinaryUrls = getProductImageUrls(product.galleryImageIds[0]);
+      return [{ url: cloudinaryUrls.card, alt: product.name }];
+    }
+    
+    // Fallback to existing images array
     if (product.images && product.images.length > 0) {
       return product.images.map((img) => 
         typeof img === 'string' 
@@ -72,10 +95,12 @@ export function ProductCard({
           : img
       );
     }
+    
+    // Fallback to single image
     return product.image 
       ? [{ url: product.image, alt: product.name }]
       : [{ url: '/placeholder.jpg', alt: product.name }];
-  }, [product.images, product.image, product.name]);
+  }, [product.images, product.image, product.primaryImageId, product.galleryImageIds, product.name]);
 
   // Auto-cycle images on hover (if multiple images)
   useEffect(() => {
@@ -171,7 +196,7 @@ export function ProductCard({
         <CardContent className="p-0">
           {/* Image Section */}
           <div className="relative aspect-square overflow-hidden">
-            <Link href={`/product/${product.id}`}>
+            <Link href={getProductUrl(product)}>
               <Image
                 src={images[currentImageIndex]?.url || '/placeholder.jpg'}
                 alt={images[currentImageIndex]?.alt || product.name}
@@ -205,20 +230,12 @@ export function ProductCard({
 
             {/* Action Buttons - Top Right */}
             <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-              {onAddToWishlist && (
-                <Button
-                  size="icon"
-                  variant="ghost"
+              {showWishlist && userId && (
+                <QuickWishlistButton
+                  productId={product.id.toString()}
+                  userId={userId}
                   className="h-10 w-10 bg-black/60 hover:bg-black/80 text-white border-0 shadow-lg backdrop-blur-sm transition-all duration-200"
-                  onClick={handleAddToWishlist}
-                >
-                  <Icons.heart 
-                    className={cn(
-                      "h-4 w-4 transition-all duration-200",
-                      isProductInWishlist ? "fill-current text-red-400" : "text-white hover:text-red-400"
-                    )} 
-                  />
-                </Button>
+                />
               )}
               
               {showQuickView && (
@@ -280,7 +297,7 @@ export function ProductCard({
 
           {/* Product Info */}
           <div className="p-4">
-            <Link href={`/product/${product.id}`} className="block group-hover:text-primary transition-colors">
+            <Link href={getProductUrl(product)} className="block group-hover:text-primary transition-colors">
               <Badge variant="outline" className="mb-2 text-xs">
                 {product.category}
               </Badge>
@@ -345,23 +362,12 @@ export function ProductCard({
                 </Button>
               )}
               
-              {onAddToWishlist && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleAddToWishlist}
-                  className={cn(
-                    "transition-all duration-200",
-                    isProductInWishlist ? "text-red-500 border-red-500 bg-red-50" : ""
-                  )}
-                >
-                  <Icons.heart 
-                    className={cn(
-                      "h-4 w-4",
-                      isProductInWishlist ? "fill-current" : ""
-                    )} 
-                  />
-                </Button>
+              {showWishlist && userId && (
+                <QuickWishlistButton
+                  productId={product.id.toString()}
+                  userId={userId}
+                  className="transition-all duration-200"
+                />
               )}
               
               {showQuickView && (

@@ -22,13 +22,24 @@ export function TrendingProducts() {
         setTrendingProducts(results.products || []);
       } catch (error) {
         console.error('Failed to load trending products:', error);
+        // Just set empty array without displaying errors for now, since backend is not running yet
         setTrendingProducts([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadTrendingProducts();
+    // Wrap in try-catch to prevent unhandled promise rejections
+    const fetchData = async () => {
+      try {
+        await loadTrendingProducts();
+      } catch (err) {
+        console.log('Error loading trending products:', err);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -71,16 +82,16 @@ export function TrendingProducts() {
                   name: product.name,
                   price: product.price,
                   salePrice: product.salePrice,
-                  images: product.media || [],
-                  category: product.category,
+                  images: product.media ? product.media.map(m => ({ url: m.url || '' })) : [],
+                  category: product.category || '',
                   inventory: product.stockQuantity || 0,
-                  sizes: product.variants?.map(v => v.size).filter(Boolean) || [],
-                  colors: product.variants?.map(v => v.color).filter(Boolean) || [],
+                  sizes: product.variants?.map(v => v.size || '').filter(Boolean) as string[] || [],
+                  colors: product.variants?.map(v => v.color || '').filter(Boolean) as string[] || [],
                   description: product.description,
                   inStock: (product.stockQuantity || 0) > 0
                 }}
                 showQuickView={true}
-                showFavorite={true}
+                showWishlist={true}
                 size="md"
               />
             ))

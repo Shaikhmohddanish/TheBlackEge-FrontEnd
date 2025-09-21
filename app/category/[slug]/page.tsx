@@ -359,7 +359,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                             </div>
                             
                             <div className="p-4">
-                              <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">
+                              <h3 className="font-medium text-white mb-1 line-clamp-2">
                                 <Link href={`/product/${product.id}`} className="hover:text-primary">
                                   {product.name}
                                 </Link>
@@ -377,7 +377,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                                       </span>
                                     </>
                                   ) : (
-                                    <span className="font-semibold text-gray-900">
+                                    <span className="font-semibold text-white">
                                       {formatPrice(product.price)}
                                     </span>
                                   )}

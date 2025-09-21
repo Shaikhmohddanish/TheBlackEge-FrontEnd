@@ -1,7 +1,6 @@
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { HeroSearchSection } from "@/components/search/hero-search-section"
-import { FeaturedCollections } from "@/components/featured-collections"
 import { TrendingProducts } from "@/components/trending-products"
 import { BrandStory } from "@/components/brand-story"
 import { FeaturesSection } from "@/components/features-section"
@@ -20,7 +19,6 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <HeroSearchSection />
-        <FeaturedCollections />
         <TrendingProducts />
         <BrandStory />
         <FeaturesSection />

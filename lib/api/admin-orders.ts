@@ -1,7 +1,7 @@
 import { makeAuthenticatedRequest, handleAPIResponse, API_BASE_URL } from '@/lib/api-client';
 
 export interface AdminOrder {
-  id: number;
+  id: string;
   orderNumber: string;
   customerName: string;
   customerEmail: string;
@@ -23,20 +23,20 @@ export interface AdminOrder {
 }
 
 export interface AdminOrderItem {
-  id: number;
-  productId: number;
+  id: string;
+  productId: string;
   productName: string;
   productImage?: string;
   productSku: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  variantId?: number;
+  variantId?: string;
   variantName?: string;
 }
 
 export interface Address {
-  id?: number;
+  id?: string;
   fullName: string;
   addressLine1: string;
   addressLine2?: string;
@@ -166,7 +166,7 @@ export const searchAdminOrders = async (
 
 // Update order status (Admin only)
 export const updateOrderStatus = async (
-  orderId: number,
+  orderId: string,
   statusUpdate: OrderStatusUpdateRequest
 ): Promise<AdminOrder> => {
   try {
@@ -190,7 +190,7 @@ export const updateOrderStatus = async (
 };
 
 // Get order by ID (Admin only)
-export const getAdminOrderById = async (orderId: number): Promise<AdminOrder> => {
+export const getAdminOrderById = async (orderId: string): Promise<AdminOrder> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}`);
     return await handleAPIResponse(response);
@@ -201,7 +201,7 @@ export const getAdminOrderById = async (orderId: number): Promise<AdminOrder> =>
 };
 
 // Cancel order (Admin only)
-export const cancelOrder = async (orderId: number, reason: string): Promise<void> => {
+export const cancelOrder = async (orderId: string, reason: string): Promise<void> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}/cancel`, {
       method: 'POST',
@@ -221,7 +221,7 @@ export const cancelOrder = async (orderId: number, reason: string): Promise<void
 };
 
 // Update order (Admin only)
-export const updateOrder = async (orderId: number, orderData: Partial<AdminOrder>): Promise<AdminOrder> => {
+export const updateOrder = async (orderId: string, orderData: Partial<AdminOrder>): Promise<AdminOrder> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}`, {
       method: 'PUT',
@@ -240,7 +240,7 @@ export const updateOrder = async (orderId: number, orderData: Partial<AdminOrder
 
 // Bulk operations
 export const bulkUpdateOrderStatus = async (
-  orderIds: number[],
+  orderIds: string[],
   statusUpdate: OrderStatusUpdateRequest
 ): Promise<void> => {
   try {

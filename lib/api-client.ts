@@ -10,32 +10,72 @@ export class APIError extends Error {
   }
 }
 
+// Check if code is running in the browser
+const isBrowser = typeof window !== 'undefined';
+
 // Token management
 export const tokenManager = {
-  getToken: () => localStorage.getItem('token'),
-  setToken: (token: string) => localStorage.setItem('token', token),
-  getRefreshToken: () => localStorage.getItem('refreshToken'),
-  setRefreshToken: (token: string) => localStorage.setItem('refreshToken', token),
+  getToken: () => {
+    if (!isBrowser) return null;
+    return localStorage.getItem('token');
+  },
+  setToken: (token: string) => {
+    if (!isBrowser) return;
+    localStorage.setItem('token', token);
+  },
+  getRefreshToken: () => {
+    if (!isBrowser) return null;
+    return localStorage.getItem('refreshToken');
+  },
+  setRefreshToken: (token: string) => {
+    if (!isBrowser) return;
+    localStorage.setItem('refreshToken', token);
+  },
   getUser: () => {
+    if (!isBrowser) return null;
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   },
-  setUser: (user: any) => localStorage.setItem('user', JSON.stringify(user)),
+  setUser: (user: any) => {
+    if (!isBrowser) return;
+    localStorage.setItem('user', JSON.stringify(user));
+  },
   clearTokens: () => {
+    if (!isBrowser) return;
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   },
+  isTokenExpired: (token: string): boolean => {
+    try {
+      if (!token) return true;
+      
+      // JWT tokens have 3 parts separated by dots
+      const parts = token.split('.');
+      if (parts.length !== 3) return true;
+      
+      // Decode the payload (middle part)
+      const payload = JSON.parse(atob(parts[1]));
+      
+      // Check if token has expired (exp is in seconds, Date.now() is in milliseconds)
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        console.log('Token is expired');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true;
+    }
+  },
 };
 
 // Note: Backend doesn't implement refresh tokens yet
-// For now, redirect to login when token expires
+// For now, handle token expiration gracefully
 export const refreshToken = async (): Promise<string | null> => {
-  console.log('Token expired, redirecting to login');
-  tokenManager.clearTokens();
-  if (typeof window !== 'undefined') {
-    window.location.href = '/login';
-  }
+  console.log('RefreshToken: Not doing anything to prevent logout loops');
+  // Completely disable refresh token logic for now
   return null;
 };
 
@@ -55,18 +95,34 @@ export const makeAuthenticatedRequest = async (
     },
   };
 
+  // Debug log for auth issues
+  if (url.includes('/cart') || url.includes('/wishlist') || url.includes('/admin')) {
+    console.log(`API Request: ${options.method || 'GET'} ${url}`);
+    console.log(`Auth Token: ${token ? 'Present (length: ' + token.length + ')' : 'Missing'}`);
+    
+    if (token) {
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]));
+          console.log(`Token payload:`, payload);
+          console.log(`Token expires:`, new Date(payload.exp * 1000));
+          console.log(`Token expired:`, payload.exp * 1000 < Date.now());
+        }
+      } catch (e) {
+        console.error('Failed to decode token for debug:', e);
+      }
+    }
+  }
+
   let response = await fetch(url, requestOptions);
 
   // If token expired, try to refresh
   if (response.status === 401) {
-    token = await refreshToken();
-    if (token) {
-      requestOptions.headers = {
-        ...requestOptions.headers,
-        'Authorization': `Bearer ${token}`,
-      };
-      response = await fetch(url, requestOptions);
-    }
+    console.log('API call got 401, handling gracefully without clearing auth');
+    // Don't try to refresh or clear tokens - just return the 401 response
+    // This prevents the logout loop while keeping the user logged in
+    return response;
   }
 
   return response;

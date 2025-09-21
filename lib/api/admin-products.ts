@@ -23,7 +23,7 @@ export interface ProductFormData {
 }
 
 export interface AdminProduct {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -80,7 +80,7 @@ export const createProduct = async (productData: ProductFormData): Promise<Admin
 };
 
 // Update an existing product
-export const updateProduct = async (id: number, productData: ProductFormData): Promise<AdminProduct> => {
+export const updateProduct = async (id: string, productData: ProductFormData): Promise<AdminProduct> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/products/${id}`, {
       method: 'PUT',
@@ -98,7 +98,7 @@ export const updateProduct = async (id: number, productData: ProductFormData): P
 };
 
 // Delete a product
-export const deleteProduct = async (id: number): Promise<void> => {
+export const deleteProduct = async (id: string): Promise<void> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/products/${id}`, {
       method: 'DELETE',
@@ -114,7 +114,7 @@ export const deleteProduct = async (id: number): Promise<void> => {
 };
 
 // Get product by ID for editing
-export const getProductById = async (id: number): Promise<AdminProduct> => {
+export const getProductById = async (id: string): Promise<AdminProduct> => {
   try {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/products/${id}`);
     return await handleAPIResponse(response);
@@ -191,7 +191,7 @@ export const searchAdminProducts = async (
 };
 
 // Toggle product active status
-export const toggleProductStatus = async (id: number, isActive: boolean): Promise<AdminProduct> => {
+export const toggleProductStatus = async (id: string, isActive: boolean): Promise<AdminProduct> => {
   try {
     const product = await getProductById(id);
     return await updateProduct(id, { ...product, isActive });
@@ -202,7 +202,7 @@ export const toggleProductStatus = async (id: number, isActive: boolean): Promis
 };
 
 // Bulk operations
-export const bulkDeleteProducts = async (productIds: number[]): Promise<void> => {
+export const bulkDeleteProducts = async (productIds: string[]): Promise<void> => {
   try {
     const deletePromises = productIds.map(id => deleteProduct(id));
     await Promise.all(deletePromises);
@@ -212,7 +212,7 @@ export const bulkDeleteProducts = async (productIds: number[]): Promise<void> =>
   }
 };
 
-export const bulkUpdateProductStatus = async (productIds: number[], isActive: boolean): Promise<void> => {
+export const bulkUpdateProductStatus = async (productIds: string[], isActive: boolean): Promise<void> => {
   try {
     const updatePromises = productIds.map(id => toggleProductStatus(id, isActive));
     await Promise.all(updatePromises);

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -149,13 +151,15 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-          <Link href="/account" className="hover:text-primary">
-            Account
-          </Link>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
+            <Link href="/account" className="hover:text-primary">
+              Account
+            </Link>
           <Icons.shoppingCart className="h-4 w-4" />
           <span>Order #{order.orderNumber}</span>
         </div>
@@ -411,6 +415,8 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
           )}
         </div>
       </div>
+      </main>
+      <Footer />
     </div>
   );
 }

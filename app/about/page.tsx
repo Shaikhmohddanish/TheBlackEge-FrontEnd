@@ -1,281 +1,331 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Icons } from '@/components/ui/icons';
+import { Separator } from '@/components/ui/separator';
+import { companyDetails } from '@/lib/config/company-details';
+import { 
+  Users, 
+  Palette, 
+  Camera, 
+  Hammer, 
+  Target, 
+  Eye, 
+  Heart, 
+  Star,
+  Quote,
+  MapPin,
+  Calendar
+} from 'lucide-react';
 
 export default function AboutPage() {
-  const teamMembers = [
-    {
-      name: "Alex Chen",
-      role: "Creative Director",
-      image: "/young-urban-male-portrait-streetwear.png",
-      bio: "Visionary behind THE BLACKEGE's artistic direction with 10+ years in street fashion."
-    },
-    {
-      name: "Maya Rodriguez",
-      role: "Head Designer",
-      image: "/young-urban-female-portrait-fashion.png",
-      bio: "Transforms street culture into wearable art, bringing authenticity to every piece."
-    },
-    {
-      name: "Jordan Kim",
-      role: "Brand Strategist",
-      image: "/young-urban-male-portrait.png",
-      bio: "Connects our brand with the global streetwear community and emerging trends."
-    },
-    {
-      name: "Zoe Williams",
-      role: "Sustainability Lead",
-      image: "/young-urban-female-portrait.png",
-      bio: "Ensures our streetwear meets the highest standards of ethical production."
-    }
-  ];
-
-  const values = [
-    {
-      icon: <Icons.star className="h-8 w-8" />,
-      title: "Authenticity",
-      description: "Every piece tells a story of genuine street culture and urban expression."
-    },
-    {
-      icon: <Icons.heart className="h-8 w-8" />,
-      title: "Community",
-      description: "We're more than a brand - we're a movement of creatives and dreamers."
-    },
-    {
-      icon: <Icons.shoppingCart className="h-8 w-8" />,
-      title: "Quality",
-      description: "Premium materials and craftsmanship in every thread, every stitch."
-    },
-    {
-      icon: <Icons.user className="h-8 w-8" />,
-      title: "Innovation",
-      description: "Pushing boundaries in design while respecting streetwear heritage."
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main>
-        {/* Hero Section */}
-        <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/urban-street-photography-dark-moody-aesthetic-graf.png"
-              alt="Urban Street Photography"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/60" />
-          </div>
-          
-          <div className="relative z-10 text-center text-white px-4 max-w-4xl">
-            <Badge className="mb-6 bg-white/20 text-white border-white/30">
-              EST. 2020
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-              THE BLACKEGE
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 font-light">
-              Where Authenticity Meets Visionary Artistry
-            </p>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed opacity-90">
-              Born from the streets, crafted for the culture. We don't just make clothes - 
-              we create statements that resonate with the urban soul.
+      <main className="container mx-auto px-4 py-16 max-w-6xl">
+        <div className="space-y-12">
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-white mb-4">About THE BLACKEGE</h1>
+            <p className="text-xl text-white max-w-3xl mx-auto">
+              Where authenticity meets visionary artistry. We're not just a clothing brand; 
+              we're the embodiment of a cultural movement.
             </p>
           </div>
-        </section>
 
-        {/* Brand Story Section */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  Our Story
-                </h2>
-                <div className="space-y-6 text-lg leading-relaxed text-muted-foreground">
-                  <p>
-                    THE BLACKEGE was born in the underground scenes of urban creativity, 
-                    where art meets rebellion and style transcends convention. Founded by 
-                    a collective of artists, designers, and street culture enthusiasts, 
-                    we saw a gap in authentic streetwear representation.
+          {/* Hero Section */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-gray-900 to-black text-white">
+            <CardContent className="p-12">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-6">THE BLACKEGE</h2>
+                <p className="text-xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+                  Rooted in the vibrant streets of India, THE BLACKEGE stands as a beacon of authenticity and 
+                  self-expression in the world of fashion. Our ethos is simple yet powerful: to capture the 
+                  true essence of Street Fashion and infuse it with visionary artistry.
+                </p>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  <Badge variant="secondary" className="bg-white text-black px-4 py-2">
+                    Streetwear Fashion
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white text-black px-4 py-2">
+                    Cultural Movement
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white text-black px-4 py-2">
+                    Visionary Artistry
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Founder Story */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Users className="h-6 w-6" />
+                The Founder's Story
+              </CardTitle>
+              <CardDescription>Meet the visionary behind THE BLACKEGE</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold">Farhan Ansari</h3>
+                  <p className="text-white">
+                    Mumbai-born Farhan Ansari launched his own Indian street wear label, "THE BLACKEGE" in 2024. 
+                    The founder and creative director's interest in construction, photography, craftsmanship and 
+                    working with artisans turned THE BLACKEGE into a well-respected brand.
                   </p>
-                  <p>
-                    What started as custom pieces for local artists has evolved into a 
-                    global movement. Every design carries the DNA of street culture - 
-                    raw, unfiltered, and unapologetically authentic.
-                  </p>
-                  <p>
-                    We believe fashion should be a canvas for self-expression, not 
-                    mass conformity. Each piece in our collection is designed to 
-                    empower individuals to express their unique identity while 
-                    connecting with a larger community of creative souls.
+                  <p className="text-white">
+                    The fashion house covers gender-fluid, men's and women's ready-to-wear and custom made clothing. 
+                    The collections are defined by Farhan Ansari's signature style. The Indian brand was one of the 
+                    first of its kind to create a niche category in the country.
                   </p>
                 </div>
-                <Button size="lg" className="mt-8">
-                  Shop Our Story
-                </Button>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-black">
+                      <Eye className="h-5 w-5" />
+                      Visual Philosophy
+                    </h4>
+                    <p className="text-sm text-black">
+                      THE BLACKEGE's founder pays crucial emphasis on the visuals of things. The aesthetics of the 
+                      designs are inspired by his own paintings, creating a unique fusion of art and fashion.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-6 rounded-lg text-black">
+                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      Brand Philosophy
+                    </h4>
+                    <p className="text-sm">
+                      "THE BLACKEGE is dangerous. It is for the people who aren't scared to cross the line and 
+                      prove a point. It is for the people who believe in art and culture!" - Farhan Ansari
+                    </p>
+                  </div>
+                </div>
               </div>
-              
-              <div className="relative">
-                <Image
-                  src="/streetwear-model-artistic-portrait-dark-aesthetic-.png"
-                  alt="Streetwear Model"
-                  width={600}
-                  height={700}
-                  className="rounded-lg object-cover w-full"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+            </CardContent>
+          </Card>
 
-        {/* Values Section */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                What Drives Us
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Our core values shape every decision, every design, and every interaction 
-                with our community.
+          {/* Who We Are */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Target className="h-6 w-6" />
+                Who We Are
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-lg text-gray-700 leading-relaxed">
+                At THE BLACKEGE, we're not just a clothing and accessories brand; we're the embodiment of a cultural movement.
               </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {values.map((value, index) => (
-                <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow">
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-center text-primary">
-                      {value.icon}
+              <p className="text-gray-700 leading-relaxed">
+                THE BLACKEGE isn't just about fabric and threads; we're storytellers, visionaries, and rebels with a cause. 
+                Each garment and accessory we craft tells a story - a narrative deeply rooted in the society and existential 
+                movements that shape our world. We're not afraid to challenge conventions or push boundaries because we believe 
+                true innovation lies at the intersection of creativity and rebellion.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 text-black">
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <Palette className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                  <h3 className="font-semibold mb-2">Storytellers</h3>
+                  <p className="text-sm text-black">
+                    Each piece tells a story rooted in society and cultural movements
+                  </p>
+                </div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <Star className="h-12 w-12 mx-auto mb-4 text-purple-600" />
+                  <h3 className="font-semibold mb-2">Visionaries</h3>
+                  <p className="text-sm text-black">
+                    We challenge conventions and push boundaries in fashion
+                  </p>
+                </div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <Heart className="h-12 w-12 mx-auto mb-4 text-red-600" />
+                  <h3 className="font-semibold mb-2">Rebels</h3>
+                  <p className="text-sm text-black">
+                    We believe true innovation lies at creativity and rebellion's intersection
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Our Vision */}
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl text-blue-800">
+                <Eye className="h-6 w-6" />
+                Our Vision
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-lg text-blue-800 leading-relaxed">
+                At THE BLACKEGE, our vision is clear: to redefine Street Fashion and empower individuals to express 
+                themselves boldly and unapologetically.
+              </p>
+              <p className="text-blue-700 leading-relaxed">
+                We envision a world where clothing isn't just a means of covering the body but a canvas for self-expression, 
+                where every garment is a statement and every accessory a conversation starter. Our aim is to inspire confidence, 
+                ignite creativity, and spark a revolution in the world of fashion.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Brand Values */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Our Values</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-black text-white p-3 rounded-full">
+                      <Palette className="h-6 w-6" />
                     </div>
-                    <h3 className="text-xl font-semibold">{value.title}</h3>
-                    <p className="text-muted-foreground">{value.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Team Section */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Meet The Collective
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                The creative minds and cultural curators behind THE BLACKEGE movement.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {teamMembers.map((member, index) => (
-                <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="relative aspect-square">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                    />
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Artistic Integrity</h3>
+                      <p className="text-white">
+                        Every design is inspired by authentic artistic vision, ensuring each piece carries genuine creative expression.
+                      </p>
+                    </div>
                   </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
-                    <p className="text-primary font-medium mb-3">{member.role}</p>
-                    <p className="text-sm text-muted-foreground">{member.bio}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Mission Statement */}
-        <section className="py-20 px-4 bg-primary text-primary-foreground">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">
-              Our Mission
-            </h2>
-            <p className="text-xl md:text-2xl leading-relaxed mb-8">
-              "To elevate streetwear beyond fashion into a form of cultural expression, 
-              creating pieces that empower individuals to authentically represent their 
-              unique identity while connecting them to a global community of creatives."
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary">
-                Join Our Community
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                Explore Collections
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Sustainability Section */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative">
-                <Image
-                  src="/dark-moody-streetwear-model-wearing-black-t-shirt-.png"
-                  alt="Sustainable Fashion"
-                  width={600}
-                  height={500}
-                  className="rounded-lg object-cover w-full"
-                />
-              </div>
-              
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  Conscious Creation
-                </h2>
-                <div className="space-y-6 text-lg leading-relaxed text-muted-foreground">
-                  <p>
-                    Street culture has always been about resourcefulness and authenticity. 
-                    We honor this heritage by implementing sustainable practices throughout 
-                    our production process.
-                  </p>
-                  <p>
-                    From ethically sourced materials to fair labor practices, every piece 
-                    is created with respect for both people and planet. Because true style 
-                    shouldn't come at the cost of our future.
-                  </p>
+                  <div className="flex items-start gap-4">
+                    <div className="bg-black text-white p-3 rounded-full">
+                      <Camera className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Visual Excellence</h3>
+                      <p className="text-white">
+                        We pay crucial emphasis on the aesthetics and visual impact of our designs, inspired by artistic paintings.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="mt-8 space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Icons.heart className="h-5 w-5 text-primary" />
-                    <span>100% Organic Cotton Options</span>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-black text-white p-3 rounded-full">
+                      <Hammer className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Craftsmanship</h3>
+                      <p className="text-white">
+                        Working closely with artisans to ensure the highest quality and attention to detail in every piece.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Icons.star className="h-5 w-5 text-primary" />
-                    <span>Fair Trade Certified Production</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Icons.shoppingCart className="h-5 w-5 text-primary" />
-                    <span>Carbon Neutral Shipping</span>
+                  <div className="flex items-start gap-4">
+                    <div className="bg-black text-white p-3 rounded-full">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Inclusivity</h3>
+                      <p className="text-white">
+                        Gender-fluid designs that celebrate diversity and self-expression for all individuals.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </CardContent>
+          </Card>
+
+          {/* Company Milestones */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Our Journey</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-black text-white p-3 rounded-full">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">2024 - The Beginning</h3>
+                    <p className="text-white">
+                      Farhan Ansari launched THE BLACKEGE, creating India's first niche streetwear brand
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="bg-black text-white p-3 rounded-full">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">Mumbai Roots</h3>
+                    <p className="text-white">
+                      Born in the vibrant streets of Mumbai, drawing inspiration from the city's cultural diversity
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="bg-black text-white p-3 rounded-full">
+                    <Star className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">Recognition</h3>
+                    <p className="text-white">
+                      Quickly established as a well-respected brand in the Indian fashion landscape
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quote Section */}
+          <Card className="border-gray-800 bg-gray-900 text-white">
+            <CardContent className="p-12 text-center">
+              <Quote className="h-12 w-12 mx-auto mb-6 text-gray-400" />
+              <blockquote className="text-2xl font-medium mb-6 leading-relaxed">
+                "THE BLACKEGE is dangerous. It is for the people who aren't scared to cross the line and prove a point. 
+                It is for the people who believe in art and culture!"
+              </blockquote>
+              <cite className="text-lg text-gray-300">- Farhan Ansari, Founder & Creative Director</cite>
+            </CardContent>
+          </Card>
+
+          {/* Contact Information */}
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-800">
+                <MapPin className="h-5 w-5" />
+                Connect With Us
+              </CardTitle>
+              <CardDescription>Join our cultural movement</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-3 text-black">Get in Touch</h4>
+                  <p className="text-sm text-black mb-4">
+                    Ready to be part of the revolution? Connect with us and join the movement.
+                  </p>
+                  <div className="space-y-2 text-black">
+                    <p className="text-sm"><strong>Email:</strong> {companyDetails.email}</p>
+                    <p className="text-sm"><strong>Phone:</strong> {companyDetails.mobile}</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-3 text-black">Visit Us</h4>
+                  <p className="text-sm text-black">
+                    {companyDetails.address.flat}, {companyDetails.address.building}<br />
+                    {companyDetails.address.road}, {companyDetails.address.locality}<br />
+                    {companyDetails.address.city}, {companyDetails.address.state} - {companyDetails.address.pincode}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
-      
       <Footer />
     </div>
   );

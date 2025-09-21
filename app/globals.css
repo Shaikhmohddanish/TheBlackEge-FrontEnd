@@ -171,3 +171,48 @@
 .hover-glow:hover {
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
 }
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Checkbox styling with light borders */
+input[type="checkbox"] {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Custom checkbox styling for checkbox components */
+.checkbox-light-border {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Apply light border to all checkbox components */
+[data-state="checked"], [data-state="unchecked"] {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Checkbox hover effects */
+input[type="checkbox"]:hover,
+[data-state="checked"]:hover,
+[data-state="unchecked"]:hover {
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Checkbox focus effects */
+input[type="checkbox"]:focus,
+[data-state="checked"]:focus,
+[data-state="unchecked"]:focus {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}

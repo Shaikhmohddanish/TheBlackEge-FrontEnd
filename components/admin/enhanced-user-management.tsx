@@ -67,7 +67,7 @@ export function EnhancedUserManagement() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const availableRoles = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_MODERATOR'];
+  const availableRoles = ['ROLE_USER', 'ROLE_ADMIN'];
 
   // Load users on mount and when filters change
   useEffect(() => {
@@ -170,34 +170,33 @@ export function EnhancedUserManagement() {
   const handleRoleUpdate = (user: AdminUser) => {
     setRoleUpdateForm({
       userId: user.id,
-      roles: user.roles || []
+      roles: user.roles && user.roles.length > 0 ? [user.roles[0]] : []
     });
     setIsRoleUpdateOpen(true);
   };
 
   const handleSubmitRoleUpdate = async () => {
-    if (!roleUpdateForm.userId) return;
+    if (!roleUpdateForm.userId || roleUpdateForm.roles.length === 0) return;
 
     try {
       setIsSubmitting(true);
-      // Update roles one by one (assuming the API accepts one role at a time)
-      for (const role of roleUpdateForm.roles) {
-        await updateUserRole(roleUpdateForm.userId, role);
-      }
+      // Only support one role per user - use the first selected role
+      const selectedRole = roleUpdateForm.roles[0];
+      await updateUserRole(roleUpdateForm.userId, selectedRole);
       
       toast({
         title: 'Success',
-        description: 'User roles updated successfully.',
+        description: 'User role updated successfully.',
       });
 
       setIsRoleUpdateOpen(false);
       setRoleUpdateForm({ userId: null, roles: [] });
       await loadUsers();
     } catch (error) {
-      console.error('Failed to update roles:', error);
+      console.error('Failed to update role:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update user roles. Please try again.',
+        description: 'Failed to update user role. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -332,9 +331,7 @@ export function EnhancedUserManagement() {
   const toggleRoleSelection = (role: string) => {
     setRoleUpdateForm(prev => ({
       ...prev,
-      roles: prev.roles.includes(role)
-        ? prev.roles.filter(r => r !== role)
-        : [...prev.roles, role]
+      roles: [role] // Only allow one role selection
     }));
   };
 
@@ -799,29 +796,30 @@ export function EnhancedUserManagement() {
               <Label>Available Roles</Label>
               {availableRoles.map((role) => (
                 <div key={role} className="flex items-center space-x-2">
-                  <Checkbox
+                  <input
+                    type="radio"
                     id={role}
+                    name="userRole"
                     checked={roleUpdateForm.roles.includes(role)}
-                    onCheckedChange={() => toggleRoleSelection(role)}
+                    onChange={() => toggleRoleSelection(role)}
+                    className="checkbox-light-border"
                   />
-                  <Label htmlFor={role} className="text-sm">
-                    {role.replace('ROLE_', '').toLowerCase().replace('_', ' ')}
+                  <Label htmlFor={role} className="text-sm cursor-pointer">
+                    {role.replace('ROLE_', '').toLowerCase()}
                   </Label>
                 </div>
               ))}
             </div>
 
             <div className="p-3 bg-muted rounded-lg">
-              <h4 className="text-sm font-medium mb-2">Selected Roles:</h4>
+              <h4 className="text-sm font-medium mb-2">Selected Role:</h4>
               <div className="flex flex-wrap gap-1">
                 {roleUpdateForm.roles.length > 0 ? (
-                  roleUpdateForm.roles.map((role) => (
-                    <Badge key={role} variant="default" className="text-xs">
-                      {role.replace('ROLE_', '')}
-                    </Badge>
-                  ))
+                  <Badge variant="default" className="text-xs">
+                    {roleUpdateForm.roles[0].replace('ROLE_', '')}
+                  </Badge>
                 ) : (
-                  <span className="text-sm text-muted-foreground">No roles selected</span>
+                  <span className="text-sm text-muted-foreground">No role selected</span>
                 )}
               </div>
             </div>

@@ -166,7 +166,7 @@ export const getAllOrders = async (
     if (status) params.append('status', status);
     if (search) params.append('search', search);
 
-    const url = `${API_BASE_URL}/admin/orders?${params.toString()}`;
+    const url = `${API_BASE_URL}/orders?${params.toString()}`;
     const response = await makeAuthenticatedRequest(url);
     const data = await handleAPIResponse(response);
 
@@ -192,8 +192,8 @@ export const updateOrderStatus = async (
     const params = new URLSearchParams();
     params.append('status', status);
 
-    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
-      method: 'PUT',
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}/status`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },

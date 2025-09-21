@@ -7,6 +7,7 @@ import { Suspense } from "react"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { ErrorBoundary } from "@/components/error-boundary"
 import "./globals.css"
 
 const montserrat = Montserrat({
@@ -69,9 +70,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Suspense fallback={null}>
-              {children}
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={null}>
+                {children}
+              </Suspense>
+            </ErrorBoundary>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
