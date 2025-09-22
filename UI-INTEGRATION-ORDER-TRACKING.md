@@ -12,7 +12,7 @@ This document provides the UI team with all necessary information to integrate t
 2. **Entity Models**: OrderTrackingEvent, ShippingAddress, TrackingEventType enum
 3. **Service Layer**: OrderTrackingService with caching and business logic
 4. **REST APIs**: Complete CRUD operations for order tracking
-5. **GraphQL APIs**: Full GraphQL support with queries and mutations
+5. **REST APIs**: Full REST API support with comprehensive endpoints
 6. **Security**: Role-based access control (Public read, Admin write)
 7. **Caching**: Performance optimization with Caffeine cache
 
@@ -457,48 +457,6 @@ export default AdminTrackingManager;
 
 ---
 
-## 🎯 GraphQL Integration (Optional)
-
-If your frontend uses GraphQL, here are the available operations:
-
-### **GraphQL Queries:**
-```graphql
-# Track order by ID
-query TrackOrder($orderId: ID!) {
-  trackOrder(orderId: $orderId) {
-    orderId
-    orderNumber
-    trackingNumber
-    carrier
-    currentStatus
-    progressPercentage
-    trackingEvents {
-      eventType
-      eventTypeDisplayName
-      description
-      location
-      eventDate
-    }
-    shippingAddress {
-      formattedAddress
-    }
-  }
-}
-
-# Track by tracking number
-query TrackByNumber($trackingNumber: String!) {
-  trackByTrackingNumber(trackingNumber: $trackingNumber) {
-    orderId
-    orderNumber
-    currentStatus
-    trackingEvents {
-      eventType
-      description
-      eventDate
-    }
-  }
-}
-```
 
 ### **GraphQL Mutations (Admin Only):**
 ```graphql

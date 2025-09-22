@@ -1,6 +1,5 @@
 // API Client for The Blackege E-commerce Platform
 export const API_BASE_URL = 'http://localhost:8080/api';
-export const GRAPHQL_URL = 'http://localhost:8080/graphql';
 
 // API Error class
 export class APIError extends Error {
@@ -152,51 +151,6 @@ export const handleAPIResponse = async (response: Response) => {
 
   return response.json();
 };
-
-// GraphQL Client
-export class GraphQLClient {
-  private endpoint: string;
-
-  constructor(endpoint: string = GRAPHQL_URL) {
-    this.endpoint = endpoint;
-  }
-
-  async query(query: string, variables: Record<string, any> = {}): Promise<any> {
-    const token = tokenManager.getToken();
-
-    try {
-      const response = await fetch(this.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify({
-          query,
-          variables,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.errors) {
-        console.error('GraphQL errors:', result.errors);
-        throw new APIError(result.errors[0].message, response.status);
-      }
-
-      return result.data;
-    } catch (error) {
-      console.error('GraphQL request failed:', error);
-      throw error;
-    }
-  }
-
-  async mutate(mutation: string, variables: Record<string, any> = {}): Promise<any> {
-    return this.query(mutation, variables);
-  }
-}
-
-export const graphqlClient = new GraphQLClient();
 
 // Cache implementation
 export class APICache {
