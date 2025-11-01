@@ -70,7 +70,6 @@ export function RazorpayPayment({
           resolve(true);
         };
         script.onerror = () => {
-          console.error('Failed to load Razorpay script');
           resolve(false);
         };
         document.body.appendChild(script);
@@ -87,7 +86,6 @@ export function RazorpayPayment({
         const config = await getPaymentConfig();
         setPaymentConfig(config);
       } catch (error) {
-        console.error('Failed to load payment config:', error);
         toast({
           title: 'Error',
           description: 'Failed to load payment configuration',
@@ -164,7 +162,6 @@ export function RazorpayPayment({
               onError?.(verificationResult.message || 'Payment verification failed');
             }
           } catch (error) {
-            console.error('Payment verification failed:', error);
             toast({
               title: 'Payment Failed',
               description: 'Failed to verify payment. Please contact support.',
@@ -201,7 +198,6 @@ export function RazorpayPayment({
       razorpay.open();
 
     } catch (error) {
-      console.error('Payment failed:', error);
       toast({
         title: 'Payment Failed',
         description: 'Failed to initiate payment. Please try again.',

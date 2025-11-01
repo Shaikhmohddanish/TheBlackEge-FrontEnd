@@ -65,7 +65,6 @@ export function ProfessionalSearchBar({
           setSuggestions(data);
         }
       } catch (error) {
-        console.error('Failed to fetch suggestions:', error);
         setSuggestions([]);
       } finally {
         setIsLoading(false);
@@ -86,7 +85,6 @@ export function ProfessionalSearchBar({
           setTrendingSearches(data);
         }
       } catch (error) {
-        console.error('Failed to fetch trending searches:', error);
       }
     };
 
@@ -125,7 +123,7 @@ export function ProfessionalSearchBar({
     if (onSearchSubmit) {
       onSearchSubmit(searchTerm);
     } else {
-      router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+      router.push(`/shop?search=${encodeURIComponent(searchTerm)}`);
     }
   };
 
@@ -216,7 +214,6 @@ export function ProfessionalSearchBar({
         }
       );
     } catch (error) {
-      console.error('Failed to track search:', error);
     }
   };
 

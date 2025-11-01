@@ -77,7 +77,6 @@ export const createOrder = async (orderData: CreateOrderData): Promise<Order> =>
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to create order:', error);
     throw error;
   }
 };
@@ -100,7 +99,6 @@ export const getUserOrders = async (page = 0, size = 10): Promise<OrdersResponse
       size: data.size,
     };
   } catch (error) {
-    console.error('Failed to fetch user orders:', error);
     throw error;
   }
 };
@@ -111,7 +109,6 @@ export const getOrder = async (orderId: string): Promise<Order> => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch order:', error);
     throw error;
   }
 };
@@ -122,7 +119,6 @@ export const getOrderByNumber = async (orderNumber: string): Promise<Order> => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/number/${orderNumber}`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch order:', error);
     throw error;
   }
 };
@@ -147,7 +143,6 @@ export const cancelOrder = async (orderId: string, reason: string): Promise<stri
 
     return await response.text();
   } catch (error) {
-    console.error('Failed to cancel order:', error);
     throw error;
   }
 };
@@ -178,7 +173,6 @@ export const getAllOrders = async (
       size: data.size,
     };
   } catch (error) {
-    console.error('Failed to fetch all orders:', error);
     throw error;
   }
 };
@@ -202,7 +196,6 @@ export const updateOrderStatus = async (
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update order status:', error);
     throw error;
   }
 };

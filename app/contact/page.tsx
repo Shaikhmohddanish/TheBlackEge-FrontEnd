@@ -80,7 +80,6 @@ export default function ContactPage() {
         });
       }
     } catch (error) {
-      console.error('Contact form error:', error);
       toast({
         title: 'Error',
         description: 'Failed to send message. Please try again.',
@@ -173,6 +172,7 @@ export default function ContactPage() {
                           value={formData.name}
                           onChange={handleInputChange}
                           placeholder="Your full name"
+                          className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                         />
                       </div>
                       <div className="space-y-2">
@@ -185,6 +185,7 @@ export default function ContactPage() {
                           value={formData.email}
                           onChange={handleInputChange}
                           placeholder="your@email.com"
+                          className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                         />
                       </div>
                     </div>
@@ -192,7 +193,7 @@ export default function ContactPage() {
                     <div className="space-y-2">
                       <Label htmlFor="category">Category</Label>
                       <Select value={formData.category} onValueChange={handleSelectChange}>
-                        <SelectTrigger>
+                        <SelectTrigger className="border-white bg-gray-900/50 text-white focus:border-blue-400">
                           <SelectValue placeholder="Select inquiry type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -215,6 +216,7 @@ export default function ContactPage() {
                         value={formData.subject}
                         onChange={handleInputChange}
                         placeholder="Brief description of your inquiry"
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
 
@@ -227,7 +229,7 @@ export default function ContactPage() {
                         value={formData.message}
                         onChange={handleInputChange}
                         placeholder="Tell us more about your inquiry..."
-                        className="min-h-[120px]"
+                        className="min-h-[120px] border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
 

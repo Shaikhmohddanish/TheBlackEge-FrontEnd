@@ -52,7 +52,6 @@ export function GoogleSignInButton({
           });
         }
       } catch (error) {
-        console.error('Failed to initialize Google OAuth:', error);
         onError?.('Failed to initialize Google sign-in');
       }
     };
@@ -92,7 +91,6 @@ export function GoogleSignInButton({
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
-      console.error('Google authentication failed:', error);
       
       toast({
         title: 'Authentication failed',

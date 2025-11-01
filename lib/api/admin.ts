@@ -85,7 +85,7 @@ export const getAdminUserDetails = async (userId: string): Promise<AdminUser> =>
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get user details:', error);
+
     throw error;
   }
 };
@@ -109,7 +109,7 @@ export const resetUserPassword = async (userId: string, passwordData: ResetPassw
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Password reset failed:', error);
+
     throw error;
   }
 };
@@ -133,7 +133,7 @@ export const toggleUserLock = async (userId: string, lock: boolean): Promise<{ s
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Toggle lock failed:', error);
+
     throw error;
   }
 };
@@ -157,7 +157,7 @@ export const toggleUserEnable = async (userId: string, enable: boolean): Promise
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Toggle enable failed:', error);
+
     throw error;
   }
 };
@@ -177,7 +177,7 @@ export const updateUserRole = async (userId: string, role: string): Promise<{ su
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Update role failed:', error);
+
     throw error;
   }
 };
@@ -200,8 +200,6 @@ export const getAllUsers = async (page = 0, size = 10, search?: string): Promise
     params.append('size', size.toString());
     if (search) params.append('search', search);
 
-    console.log('Making getAllUsers API call with URL:', `${API_BASE_URL}/admin/dashboard/users?${params.toString()}`);
-    console.log('Using token:', token?.substring(0, 20) + '...');
     
     const response = await fetch(`${API_BASE_URL}/admin/dashboard/users?${params.toString()}`, {
       method: 'GET',
@@ -211,8 +209,6 @@ export const getAllUsers = async (page = 0, size = 10, search?: string): Promise
       },
     });
 
-    console.log('getAllUsers response status:', response.status, response.statusText);
-    console.log('getAllUsers response headers:', Object.fromEntries(response.headers.entries()));
 
     const data = await handleAPIResponse(response);
     
@@ -224,7 +220,7 @@ export const getAllUsers = async (page = 0, size = 10, search?: string): Promise
       currentPage: data.number || 0,
     };
   } catch (error) {
-    console.error('Failed to get users:', error);
+
     throw error;
   }
 };
@@ -237,7 +233,6 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
       throw new Error('Authentication required');
     }
 
-    console.log('Making dashboard summary API call...');
     const response = await fetch(`${API_BASE_URL}/admin/dashboard/summary`, {
       method: 'GET',
       headers: {
@@ -246,12 +241,9 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
       },
     });
 
-    console.log('Dashboard summary response status:', response.status);
     const result = await handleAPIResponse(response);
-    console.log('Dashboard summary data:', result);
     return result;
   } catch (error) {
-    console.error('Failed to get dashboard summary:', error);
     throw error;
   }
 };
@@ -277,7 +269,6 @@ export const getSalesAnalytics = async (startDate: string, endDate: string): Pro
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get sales analytics:', error);
     throw error;
   }
 };
@@ -303,7 +294,6 @@ export const getProductAnalytics = async (startDate: string, endDate: string): P
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get product analytics:', error);
     throw error;
   }
 };
@@ -329,7 +319,6 @@ export const getUserAnalytics = async (startDate: string, endDate: string): Prom
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get user analytics:', error);
     throw error;
   }
 };
@@ -368,7 +357,6 @@ export const getAllCoupons = async (
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get coupons:', error);
     throw error;
   }
 };
@@ -390,7 +378,6 @@ export const getCouponById = async (id: string): Promise<CouponDto> => {
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to get coupon:', error);
     throw error;
   }
 };
@@ -414,7 +401,6 @@ export const createCoupon = async (couponData: Omit<CouponDto, 'id' | 'currentUs
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to create coupon:', error);
     throw error;
   }
 };
@@ -438,7 +424,6 @@ export const updateCoupon = async (id: string, couponData: Omit<CouponDto, 'id' 
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update coupon:', error);
     throw error;
   }
 };
@@ -462,7 +447,6 @@ export const deleteCoupon = async (id: string): Promise<void> => {
       throw new Error('Failed to delete coupon');
     }
   } catch (error) {
-    console.error('Failed to delete coupon:', error);
     throw error;
   }
 };

@@ -10,15 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Icons } from '@/components/ui/icons';
 import { useToast } from '@/hooks/use-toast';
-import { trackOrderById, trackOrderByNumber, type OrderTracking } from '@/lib/api/tracking';
-import { TrackingProgressBar } from '@/components/tracking/progress-bar';
-import { TrackingTimeline } from '@/components/tracking/timeline';
-import { TrackingStatusBadge } from '@/components/tracking/status-badge';
+import OrderTrackingDisplay from '@/components/order/OrderTrackingDisplay';
+import { getAdminOrderById } from '@/lib/api/admin-orders';
+import type { AdminOrder } from '@/lib/api/admin-orders';
 
 export default function TrackOrderPage() {
   const [orderId, setOrderId] = useState('');
-  const [trackingNumber, setTrackingNumber] = useState('');
-  const [tracking, setTracking] = useState<OrderTracking | null>(null);
+  const [orderNumber, setOrderNumber] = useState('');
+  const [order, setOrder] = useState<AdminOrder | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -38,15 +37,16 @@ export default function TrackOrderPage() {
     setError(null);
     
     try {
-      const trackingData = await trackOrderById(orderId);
-      setTracking(trackingData);
+      const orderData = await getAdminOrderById(orderId);
+      setOrder(orderData);
       toast({
         title: 'Success',
-        description: 'Order tracking information loaded successfully',
+        description: 'Order found successfully',
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to track order';
+      const errorMessage = err instanceof Error ? err.message : 'Order not found';
       setError(errorMessage);
+      setOrder(null);
       toast({
         title: 'Error',
         description: errorMessage,
@@ -59,10 +59,10 @@ export default function TrackOrderPage() {
 
   const handleTrackByNumber = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trackingNumber.trim()) {
+    if (!orderNumber.trim()) {
       toast({
         title: 'Error',
-        description: 'Please enter a tracking number',
+        description: 'Please enter an order number',
         variant: 'destructive',
       });
       return;
@@ -72,15 +72,24 @@ export default function TrackOrderPage() {
     setError(null);
     
     try {
-      const trackingData = await trackOrderByNumber(trackingNumber);
-      setTracking(trackingData);
-      toast({
-        title: 'Success',
-        description: 'Order tracking information loaded successfully',
-      });
+      // For simplicity, we'll search by order number by calling the search endpoint
+      // In a real implementation, you might want a specific endpoint for this
+      const { searchAdminOrders } = await import('@/lib/api/admin-orders');
+      const searchResults = await searchAdminOrders(orderNumber, 0, 1);
+      
+      if (searchResults.orders.length > 0) {
+        setOrder(searchResults.orders[0]);
+        toast({
+          title: 'Success',
+          description: 'Order found successfully',
+        });
+      } else {
+        throw new Error('Order not found');
+      }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to track order';
+      const errorMessage = err instanceof Error ? err.message : 'Order not found';
       setError(errorMessage);
+      setOrder(null);
       toast({
         title: 'Error',
         description: errorMessage,
@@ -93,8 +102,8 @@ export default function TrackOrderPage() {
 
   const resetForm = () => {
     setOrderId('');
-    setTrackingNumber('');
-    setTracking(null);
+    setOrderNumber('');
+    setOrder(null);
     setError(null);
   };
 
@@ -113,7 +122,7 @@ export default function TrackOrderPage() {
             </p>
           </div>
 
-          {!tracking ? (
+          {!order ? (
             /* Search Form */
             <Card className="mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               <CardHeader>
@@ -122,14 +131,14 @@ export default function TrackOrderPage() {
                   Find Your Order
                 </CardTitle>
                 <CardDescription>
-                  Track your order using either your order ID or tracking number
+                  Track your order using either your order ID or order number
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="order-id" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="order-id">Order ID</TabsTrigger>
-                    <TabsTrigger value="tracking-number">Tracking Number</TabsTrigger>
+                    <TabsTrigger value="order-number">Order Number</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="order-id" className="space-y-4">
@@ -139,7 +148,7 @@ export default function TrackOrderPage() {
                         <Input
                           id="orderId"
                           type="text"
-                          placeholder="Enter your order ID (e.g., 123)"
+                          placeholder="Enter your order ID"
                           value={orderId}
                           onChange={(e) => setOrderId(e.target.value)}
                           className="w-full"
@@ -161,16 +170,16 @@ export default function TrackOrderPage() {
                     </form>
                   </TabsContent>
                   
-                  <TabsContent value="tracking-number" className="space-y-4">
+                  <TabsContent value="order-number" className="space-y-4">
                     <form onSubmit={handleTrackByNumber} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="trackingNumber">Tracking Number</Label>
+                        <Label htmlFor="orderNumber">Order Number</Label>
                         <Input
-                          id="trackingNumber"
+                          id="orderNumber"
                           type="text"
-                          placeholder="Enter tracking number (e.g., 1Z999AA1234567890)"
-                          value={trackingNumber}
-                          onChange={(e) => setTrackingNumber(e.target.value)}
+                          placeholder="Enter order number (e.g., ORD-1234)"
+                          value={orderNumber}
+                          onChange={(e) => setOrderNumber(e.target.value)}
                           className="w-full"
                         />
                       </div>
@@ -202,7 +211,7 @@ export default function TrackOrderPage() {
               </CardContent>
             </Card>
           ) : (
-            /* Tracking Results */
+            /* Order Tracking Display */
             <div className="space-y-8">
               {/* Back Button */}
               <Button
@@ -214,122 +223,14 @@ export default function TrackOrderPage() {
                 Search Another Order
               </Button>
 
-              {/* Order Header */}
-              <Card className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-2xl">
-                        Order #{tracking.orderNumber}
-                      </CardTitle>
-                      <CardDescription className="text-base">
-                        Order ID: {tracking.orderId}
-                      </CardDescription>
-                    </div>
-                    <TrackingStatusBadge 
-                      status={tracking.currentStatus} 
-                      size="lg"
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Progress Bar */}
-                  <TrackingProgressBar
-                    percentage={tracking.progressPercentage}
-                    status={tracking.currentStatus}
-                  />
-
-                  {/* Tracking Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {tracking.trackingNumber && (
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Tracking Number</h4>
-                        <div className="flex items-center gap-2">
-                          <code className="bg-muted px-2 py-1 rounded text-sm">
-                            {tracking.trackingNumber}
-                          </code>
-                          {tracking.trackingUrl && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              asChild
-                            >
-                              <a 
-                                href={tracking.trackingUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                              >
-                                Track with {tracking.carrier}
-                              </a>
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {tracking.currentLocation && (
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Current Location</h4>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Icons.user className="h-4 w-4" />
-                          {tracking.currentLocation}
-                        </div>
-                      </div>
-                    )}
-
-                    {tracking.estimatedDeliveryDate && (
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Estimated Delivery</h4>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Icons.shoppingCart className="h-4 w-4" />
-                          {new Date(tracking.estimatedDeliveryDate).toLocaleDateString()}
-                        </div>
-                      </div>
-                    )}
-
-                    {tracking.actualDeliveryDate && (
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Delivered On</h4>
-                        <div className="flex items-center gap-2 text-green-600">
-                          <Icons.shoppingCart className="h-4 w-4" />
-                          {new Date(tracking.actualDeliveryDate).toLocaleDateString()}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Timeline */}
-              <Card className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <CardContent className="pt-6">
-                  <TrackingTimeline events={tracking.trackingEvents} />
-                </CardContent>
-              </Card>
-
-              {/* Shipping Address */}
-              {tracking.shippingAddress && (
-                <Card className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Icons.user className="h-5 w-5" />
-                      Shipping Address
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted p-4 rounded-lg">
-                      <pre className="text-sm text-foreground whitespace-pre-wrap">
-                        {tracking.shippingAddress.formattedAddress}
-                      </pre>
-                      {tracking.shippingAddress.phoneNumber && (
-                        <div className="mt-2 text-sm text-muted-foreground">
-                          Phone: {tracking.shippingAddress.phoneNumber}
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              {/* Use the OrderTrackingDisplay component */}
+              <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <OrderTrackingDisplay 
+                  orderId={order.id} 
+                  orderNumber={order.orderNumber} 
+                  orderStatus={order.status} 
+                />
+              </div>
             </div>
           )}
 

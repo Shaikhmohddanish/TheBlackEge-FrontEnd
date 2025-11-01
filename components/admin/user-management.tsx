@@ -42,7 +42,6 @@ export function AdminUserManagement({ userId, onUserUpdate }: AdminUserManagemen
       const userData = await getAdminUserDetails(userId);
       setUser(userData);
     } catch (error) {
-      console.error('Failed to fetch user details:', error);
       toast({
         title: 'Error',
         description: 'Failed to load user details',

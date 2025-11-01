@@ -56,7 +56,6 @@ export default function RegisterPage() {
       setPasswordValidation(result);
       setShowCompromiseWarning(result.compromised);
     } catch (error) {
-      console.error('Password validation failed:', error);
     }
   };
 
@@ -167,6 +166,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Enter your full name"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -181,6 +181,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Choose a username"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -195,6 +196,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Enter your email"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -208,6 +210,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Phone number (optional)"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -222,6 +225,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Create a strong password"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                   <PasswordStrengthMeter password={formData.password} />
                 </div>
@@ -237,6 +241,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     placeholder="Confirm your password"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                   {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                     <div className="flex items-center gap-2 text-sm text-red-600">

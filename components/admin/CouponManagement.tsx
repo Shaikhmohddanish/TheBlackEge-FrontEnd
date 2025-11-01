@@ -44,7 +44,6 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
       const response = await getAllCoupons();
       setCoupons(response.content);
     } catch (error) {
-      console.error('Error loading coupons:', error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +73,6 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
       resetForm();
       onUpdate?.();
     } catch (error) {
-      console.error('Error saving coupon:', error);
     } finally {
       setLoading(false);
     }
@@ -88,7 +86,6 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
         await loadCoupons();
         onUpdate?.();
       } catch (error) {
-        console.error('Error deleting coupon:', error);
       } finally {
         setLoading(false);
       }
@@ -157,6 +154,7 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                   placeholder="SAVE10"
+                  className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                 />
               </div>
 
@@ -167,6 +165,7 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="10% off on all items"
+                  className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                 />
               </div>
 
@@ -177,7 +176,7 @@ export function CouponManagement({ onUpdate }: CouponManagementProps) {
                     value={formData.discountType} 
                     onValueChange={(value) => setFormData({ ...formData, discountType: value as 'PERCENTAGE' | 'FIXED_AMOUNT' })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border-white bg-gray-900/50 text-white focus:border-blue-400">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

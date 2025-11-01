@@ -1,4 +1,5 @@
 import { Product } from './products';
+import { API_BASE_URL } from '../api-client';
 
 export interface WishlistItem {
   productId: string;
@@ -42,8 +43,6 @@ export interface WishlistAnalytics {
   wishlistCount: number;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
-
 // Wishlist CRUD operations
 export const createWishlist = async (
   userId: string,
@@ -51,7 +50,7 @@ export const createWishlist = async (
   description?: string,
   isPublic: boolean = false
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +67,7 @@ export const createWishlist = async (
 };
 
 export const getUserWishlists = async (userId: string): Promise<Wishlist[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/user/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/user/${userId}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
@@ -82,21 +81,48 @@ export const getUserWishlists = async (userId: string): Promise<Wishlist[]> => {
 };
 
 export const getDefaultWishlist = async (userId: string): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/user/${userId}/default`, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch default wishlist');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  if (!token) {
+    throw new Error('Authentication token not found');
   }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/wishlists/user/${userId}/default`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-  return response.json();
+    if (!response.ok) {
+      // Provide more detailed error information
+      const errorText = await response.text();
+      let errorMessage = `Failed to fetch default wishlist (${response.status})`;
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        // If not JSON, use the text or default message
+        errorMessage = errorText || errorMessage;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Re-throw with more context if it's a network error
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to the server. Please check if the backend is running.');
+    }
+    throw error;
+  }
 };
 
 export const getWishlistById = async (wishlistId: string): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
@@ -115,7 +141,7 @@ export const updateWishlist = async (
   description?: string,
   isPublic: boolean = false
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -132,7 +158,7 @@ export const updateWishlist = async (
 };
 
 export const deleteWishlist = async (wishlistId: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -152,7 +178,7 @@ export const addItemToWishlist = async (
   notes?: string,
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' = 'MEDIUM'
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}/items`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}/items`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -172,7 +198,7 @@ export const removeItemFromWishlist = async (
   wishlistId: string,
   productId: string
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}/items/${productId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}/items/${productId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -192,7 +218,7 @@ export const addToWishlist = async (
   productId: string,
   wishlistName?: string
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/add-to-wishlist`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/add-to-wishlist`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -212,7 +238,7 @@ export const addToDefaultWishlist = async (
   userId: string,
   productId: string
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/add-to-default`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/add-to-default`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -232,7 +258,7 @@ export const isProductInWishlist = async (
   userId: string,
   productId: string
 ): Promise<boolean> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/check/${userId}/${productId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/check/${userId}/${productId}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
@@ -250,7 +276,7 @@ export const searchWishlists = async (
   userId: string,
   query: string
 ): Promise<Wishlist[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/search/${userId}?query=${encodeURIComponent(query)}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/search/${userId}?query=${encodeURIComponent(query)}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
@@ -264,7 +290,7 @@ export const searchWishlists = async (
 };
 
 export const getPublicWishlists = async (): Promise<Wishlist[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/public`);
+  const response = await fetch(`${API_BASE_URL}/wishlists/public`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch public wishlists');
@@ -278,7 +304,7 @@ export const setDefaultWishlist = async (
   wishlistId: string,
   userId: string
 ): Promise<Wishlist> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/${wishlistId}/set-default`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}/set-default`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -296,7 +322,7 @@ export const setDefaultWishlist = async (
 
 // Analytics
 export const getWishlistAnalytics = async (userId: string): Promise<WishlistAnalytics> => {
-  const response = await fetch(`${API_BASE_URL}/api/wishlists/analytics/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlists/analytics/${userId}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },

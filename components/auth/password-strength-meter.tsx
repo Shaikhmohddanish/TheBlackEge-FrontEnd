@@ -39,7 +39,6 @@ export function PasswordStrengthMeter({
       const result = await validatePassword(password);
       setValidation(result);
     } catch (error) {
-      console.error('Password validation failed:', error);
       setValidation({
         valid: false,
         strength: 0,

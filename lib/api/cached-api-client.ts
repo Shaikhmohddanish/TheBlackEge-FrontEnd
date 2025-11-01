@@ -374,7 +374,6 @@ export class CacheManager {
    */
   static async clearCacheByTag(tag: string): Promise<void> {
     // This would need to be implemented with a proper key index
-    console.log(`Clearing cache for tag: ${tag}`);
   }
 
   /**

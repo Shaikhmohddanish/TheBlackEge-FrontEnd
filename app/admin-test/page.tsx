@@ -34,23 +34,17 @@ export default function AdminAPITest() {
 
     // Test 2: Users endpoint
     try {
-      console.log('Testing getAllUsers...');
       const usersData = await getAllUsers(0, 10);
-      console.log('Users test result:', usersData);
       addResult('Get All Users', true, usersData);
     } catch (error) {
-      console.error('Users test failed:', error);
       addResult('Get All Users', false, null, error);
     }
 
     // Test 3: Dashboard summary endpoint
     try {
-      console.log('Testing getDashboardSummary...');
       const summaryData = await getDashboardSummary();
-      console.log('Summary test result:', summaryData);
       addResult('Get Dashboard Summary', true, summaryData);
     } catch (error) {
-      console.error('Summary test failed:', error);
       addResult('Get Dashboard Summary', false, null, error);
     }
 

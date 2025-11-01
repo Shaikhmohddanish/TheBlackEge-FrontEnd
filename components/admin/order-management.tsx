@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import OrderTrackingManagement from '@/components/admin/OrderTrackingManagement';
 import { 
   getAdminOrders,
   searchAdminOrders,
@@ -42,7 +43,7 @@ export function OrderManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'ALL'>('ALL');
-  const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isStatusUpdateOpen, setIsStatusUpdateOpen] = useState(false);
@@ -53,7 +54,7 @@ export function OrderManagement() {
 
   // Status update form state
   const [statusUpdateForm, setStatusUpdateForm] = useState<{
-    orderId: number | null;
+    orderId: string | null;
     status: OrderStatus;
     notes: string;
   }>({
@@ -86,7 +87,6 @@ export function OrderManagement() {
       setTotalElements(response.totalElements);
       setTotalPages(response.totalPages);
     } catch (error) {
-      console.error('Failed to load orders:', error);
       toast({
         title: 'Error',
         description: 'Failed to load orders. Please try again.',
@@ -107,13 +107,12 @@ export function OrderManagement() {
     setCurrentPage(0);
   };
 
-  const handleViewOrder = async (orderId: number) => {
+  const handleViewOrder = async (orderId: string) => {
     try {
       const order = await getAdminOrderById(orderId);
       setSelectedOrder(order);
       setIsOrderDetailOpen(true);
     } catch (error) {
-      console.error('Failed to load order details:', error);
       toast({
         title: 'Error',
         description: 'Failed to load order details.',
@@ -122,10 +121,10 @@ export function OrderManagement() {
     }
   };
 
-  const handleUpdateOrderStatus = (order: AdminOrder) => {
+    const handleUpdateOrderStatus = (orderId: string, currentStatus: OrderStatus) => {
     setStatusUpdateForm({
-      orderId: order.id,
-      status: order.status,
+      orderId: orderId,
+      status: currentStatus,
       notes: ''
     });
     setIsStatusUpdateOpen(true);
@@ -152,7 +151,6 @@ export function OrderManagement() {
       setStatusUpdateForm({ orderId: null, status: OrderStatus.PENDING, notes: '' });
       await loadOrders();
     } catch (error) {
-      console.error('Failed to update order status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update order status. Please try again.',
@@ -163,7 +161,7 @@ export function OrderManagement() {
     }
   };
 
-  const handleCancelOrder = async (orderId: number, reason: string) => {
+  const handleCancelOrder = async (orderId: string, reason: string) => {
     try {
       await cancelOrder(orderId, reason);
       toast({
@@ -172,7 +170,6 @@ export function OrderManagement() {
       });
       await loadOrders();
     } catch (error) {
-      console.error('Failed to cancel order:', error);
       toast({
         title: 'Error',
         description: 'Failed to cancel order. Please try again.',
@@ -196,7 +193,6 @@ export function OrderManagement() {
       setSelectedOrders([]);
       await loadOrders();
     } catch (error) {
-      console.error('Failed to bulk update orders:', error);
       toast({
         title: 'Error',
         description: 'Failed to update orders. Please try again.',
@@ -205,7 +201,7 @@ export function OrderManagement() {
     }
   };
 
-  const handleSelectOrder = (orderId: number) => {
+  const handleSelectOrder = (orderId: string) => {
     setSelectedOrders(prev => 
       prev.includes(orderId) 
         ? prev.filter(id => id !== orderId)
@@ -425,7 +421,7 @@ export function OrderManagement() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleUpdateOrderStatus(order)}
+                            onClick={() => handleUpdateOrderStatus(order.id, order.status)}
                           >
                             <Icons.repeatIcon className="w-4 h-4" />
                           </Button>
@@ -671,6 +667,16 @@ export function OrderManagement() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Order Tracking Management */}
+              <OrderTrackingManagement
+                order={selectedOrder}
+                onOrderUpdate={(updatedOrder) => {
+                  setSelectedOrder(updatedOrder);
+                  // Refresh the orders list to reflect changes
+                  loadOrders();
+                }}
+              />
             </div>
           )}
         </DialogContent>

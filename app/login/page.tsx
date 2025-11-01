@@ -27,10 +27,10 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Temporarily disable auto-redirect to debug the refresh issue
+
   // React.useEffect(() => {
   //   if (!authLoading && isAuthenticated) {
-  //     console.log('User is authenticated, redirecting...');
+
   //     router.replace('/');
   //   }
   // }, [authLoading, isAuthenticated, router]);
@@ -50,19 +50,14 @@ export default function LoginPage() {
     setError('');
 
     try {
-      console.log('Starting login...');
       const response = await login(formData);
-      console.log('Login response:', response);
       
       if (response.success) {
-        console.log('Login successful, showing toast');
         toast({
           title: 'Login successful',
           description: 'Welcome back to THE BLACKEGE!',
         });
         
-        // Simple direct navigation without any delays or checks
-        console.log('Navigating to home page');
         window.location.href = '/';
       }
     } catch (err) {
@@ -143,6 +138,7 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     placeholder="Enter your username or email"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -157,6 +153,7 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     placeholder="Enter your password"
                     disabled={isLoading}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 

@@ -41,7 +41,6 @@ export const useWishlist = (): UseWishlistReturn => {
     // Extra check for token existence and validity before making API call
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) {
-      console.log('Wishlist: No token available, skipping wishlist fetch');
       setWishlist(null);
       return;
     }
@@ -49,7 +48,6 @@ export const useWishlist = (): UseWishlistReturn => {
     // Import tokenManager dynamically to avoid SSR issues
     const { tokenManager } = await import('@/lib/api-client');
     if (tokenManager.isTokenExpired(token)) {
-      console.log('Wishlist: Token is expired, skipping wishlist fetch');
       setWishlist(null);
       setError('Your session has expired. Please log in again.');
       return;
@@ -58,18 +56,26 @@ export const useWishlist = (): UseWishlistReturn => {
     try {
       setIsLoading(true);
       setError(null);
+      
       const wishlistData = await getDefaultWishlist(user.id);
       setWishlist(wishlistData);
     } catch (err) {
-      // Handle auth failures gracefully - don't clear auth but log the issue
-      if (err instanceof Error && (err.message.includes('401') || err.message.includes('Unauthorized'))) {
-        console.log('Wishlist fetch failed due to auth - backend rejected token but keeping user logged in');
-        setWishlist(null); // Set null wishlist to avoid errors
-        setError('Wishlist temporarily unavailable - please try refreshing');
+      
+      // Handle different types of errors
+      if (err instanceof Error) {
+        if (err.message.includes('401') || err.message.includes('Unauthorized') || err.message.includes('Authentication')) {
+          setWishlist(null);
+          setError('Authentication required. Please log in again.');
+        } else if (err.message.includes('Network error') || err.message.includes('fetch')) {
+          setWishlist(null);
+          setError('Unable to connect to server. Please check your internet connection and try again.');
+        } else {
+          setWishlist(null);
+          setError(`Failed to load wishlist: ${err.message}`);
+        }
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch wishlist';
-        setError(errorMessage);
-        console.error('Failed to fetch wishlist:', err);
+        setWishlist(null);
+        setError('An unexpected error occurred while loading your wishlist.');
       }
     } finally {
       setIsLoading(false);
@@ -143,7 +149,6 @@ export const useWishlist = (): UseWishlistReturn => {
       if (!user) return false;
       return await isProductInWishlist(user.id, productId);
     } catch (err) {
-      console.error('Failed to check if product is in wishlist:', err);
       return false;
     }
   }, [user]);

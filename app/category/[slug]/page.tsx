@@ -75,7 +75,6 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         setTotalElements(productsData.totalElements);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load category');
-        console.error('Failed to load category:', err);
       } finally {
         setIsLoading(false);
       }

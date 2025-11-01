@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { ImageUploadManager } from '@/components/admin/image-upload-manager';
+import { VariantStockManager } from '@/components/admin/variant-stock-manager';
 import { 
   getAdminProducts, 
   searchAdminProducts, 
@@ -29,6 +31,7 @@ import {
   type ProductFormData,
   type ProductsResponse 
 } from '@/lib/api/admin-products';
+import { getActiveCategories, type Category } from '@/lib/api/admin-categories';
 import { formatPrice } from '@/lib/currency-utils';
 
 const defaultCategories = [
@@ -50,12 +53,16 @@ export function ProductManagement() {
   const [pageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [sortBy, setSortBy] = useState('id');
   const [sortDir, setSortDir] = useState('desc');
+
+  // Categories state
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   const { toast } = useToast();
 
@@ -79,15 +86,42 @@ export function ProductManagement() {
     tags: [],
     seoTitle: '',
     seoDescription: '',
-    images: []
+    images: [],
+    variants: [] // Add variants support
   });
+
+  // Image management state
+  const [productImages, setProductImages] = useState<Array<{
+    id: string;
+    file?: File;
+    url: string;
+    preview: string;
+  }>>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load products on mount and when filters change
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, [currentPage, sortBy, sortDir]);
+
+  const loadCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const categories = await getActiveCategories();
+      setAvailableCategories(categories);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories. Please try again.',
+        variant: 'destructive',
+      });
+      setAvailableCategories([]);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
   const loadProducts = async () => {
     try {
@@ -100,7 +134,6 @@ export function ProductManagement() {
       setTotalElements(response.totalElements);
       setTotalPages(response.totalPages);
     } catch (error) {
-      console.error('Failed to load products:', error);
       toast({
         title: 'Error',
         description: 'Failed to load products. Please try again.',
@@ -136,8 +169,10 @@ export function ProductManagement() {
       tags: [],
       seoTitle: '',
       seoDescription: '',
-      images: []
+      images: [],
+      variants: [] // Add variants support
     });
+    setProductImages([]);
   };
 
   const handleCreateProduct = async () => {
@@ -162,7 +197,6 @@ export function ProductManagement() {
       resetForm();
       await loadProducts();
     } catch (error) {
-      console.error('Failed to create product:', error);
       toast({
         title: 'Error',
         description: 'Failed to create product. Please try again.',
@@ -194,7 +228,8 @@ export function ProductManagement() {
       tags: product.tags || [],
       seoTitle: product.seoTitle || '',
       seoDescription: product.seoDescription || '',
-      images: product.images || []
+      images: product.images || [],
+      variants: product.variants || [] // Add variants support
     });
     setIsEditDialogOpen(true);
   };
@@ -224,7 +259,6 @@ export function ProductManagement() {
       resetForm();
       await loadProducts();
     } catch (error) {
-      console.error('Failed to update product:', error);
       toast({
         title: 'Error',
         description: 'Failed to update product. Please try again.',
@@ -235,7 +269,7 @@ export function ProductManagement() {
     }
   };
 
-  const handleDeleteProduct = async (id: number) => {
+  const handleDeleteProduct = async (id: string) => {
     try {
       await deleteProduct(id);
       toast({
@@ -244,7 +278,6 @@ export function ProductManagement() {
       });
       await loadProducts();
     } catch (error) {
-      console.error('Failed to delete product:', error);
       toast({
         title: 'Error',
         description: 'Failed to delete product. Please try again.',
@@ -253,7 +286,7 @@ export function ProductManagement() {
     }
   };
 
-  const handleToggleStatus = async (id: number, isActive: boolean) => {
+  const handleToggleStatus = async (id: string, isActive: boolean) => {
     try {
       await toggleProductStatus(id, !isActive);
       toast({
@@ -262,7 +295,6 @@ export function ProductManagement() {
       });
       await loadProducts();
     } catch (error) {
-      console.error('Failed to toggle product status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update product status. Please try again.',
@@ -283,7 +315,6 @@ export function ProductManagement() {
       setSelectedProducts([]);
       await loadProducts();
     } catch (error) {
-      console.error('Failed to bulk delete products:', error);
       toast({
         title: 'Error',
         description: 'Failed to delete products. Please try again.',
@@ -304,7 +335,6 @@ export function ProductManagement() {
       setSelectedProducts([]);
       await loadProducts();
     } catch (error) {
-      console.error('Failed to bulk update product status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update product status. Please try again.',
@@ -313,11 +343,11 @@ export function ProductManagement() {
     }
   };
 
-  const handleSelectProduct = (id: number) => {
+    const handleSelectProduct = (productId: string) => {
     setSelectedProducts(prev => 
-      prev.includes(id) 
-        ? prev.filter(productId => productId !== id)
-        : [...prev, id]
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
     );
   };
 
@@ -336,37 +366,57 @@ export function ProductManagement() {
 
   // Product form component
   const ProductForm = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+    <div className="space-y-6 max-h-[70vh] overflow-y-auto bg-black/90 p-6 rounded-lg">
+      {/* Product Images Section */}
+      <div className="space-y-4">
+        <ImageUploadManager
+          images={productImages}
+          onImagesChange={(images) => {
+            setProductImages(images);
+            // Update form data with image URLs
+            setFormData(prev => ({
+              ...prev,
+              images: images.map(img => img.url || img.preview)
+            }));
+          }}
+          maxImages={8}
+        />
+      </div>
+
+      <Separator className="bg-white/20" />
+
       {/* Basic Information */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Basic Information</h3>
+        <h3 className="text-lg font-semibold text-white">Basic Information</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Product Name *</Label>
+            <Label htmlFor="name" className="text-white">Product Name *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Enter product name"
               required
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sku">SKU *</Label>
+            <Label htmlFor="sku" className="text-white">SKU *</Label>
             <Input
               id="sku"
               value={formData.sku}
               onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
               placeholder="Enter SKU"
               required
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description *</Label>
+          <Label htmlFor="description" className="text-white">Description *</Label>
           <Textarea
             id="description"
             value={formData.description}
@@ -374,12 +424,13 @@ export function ProductManagement() {
             placeholder="Enter product description"
             rows={4}
             required
+            className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="price">Price *</Label>
+            <Label htmlFor="price" className="text-white">Price *</Label>
             <Input
               id="price"
               type="number"
@@ -389,11 +440,17 @@ export function ProductManagement() {
               onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
               placeholder="0.00"
               required
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="stockQuantity">Stock Quantity *</Label>
+            <Label htmlFor="stockQuantity" className="text-white">
+              Base Stock Quantity *
+              <span className="text-xs text-gray-400 ml-2">
+                (Used when no variants are defined)
+              </span>
+            </Label>
             <Input
               id="stockQuantity"
               type="number"
@@ -401,12 +458,19 @@ export function ProductManagement() {
               value={formData.stockQuantity}
               onChange={(e) => setFormData(prev => ({ ...prev, stockQuantity: parseInt(e.target.value) || 0 }))}
               placeholder="0"
-              required
+              required={!formData.variants || formData.variants.length === 0}
+              disabled={formData.variants && formData.variants.length > 0}
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70 disabled:opacity-50"
             />
+            {formData.variants && formData.variants.length > 0 && (
+              <p className="text-xs text-yellow-400">
+                Stock is managed by variants below. Base stock is disabled.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="weight">Weight (kg)</Label>
+            <Label htmlFor="weight" className="text-white">Weight (kg)</Label>
             <Input
               id="weight"
               type="number"
@@ -415,96 +479,160 @@ export function ProductManagement() {
               value={formData.weight}
               onChange={(e) => setFormData(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
               placeholder="0.00"
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-white/20" />
 
       {/* Categories and Attributes */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Categories & Attributes</h3>
+        <h3 className="text-lg font-semibold text-white">Categories & Attributes</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="categories">Categories * (comma-separated)</Label>
-            <Input
-              id="categories"
-              value={formData.categories.join(', ')}
-              onChange={(e) => handleArrayInput('categories', e.target.value)}
-              placeholder="T-Shirts, Casual, Cotton"
-              required
-            />
-            <div className="text-xs text-muted-foreground">
-              Available: {defaultCategories.join(', ')}
+            <Label className="text-white">Categories *</Label>
+            <div className="space-y-2">
+              {loadingCategories ? (
+                <div className="flex items-center space-x-2 p-3 border border-white/30 rounded-md">
+                  <LoadingSpinner size="sm" />
+                  <span className="text-gray-400">Loading categories...</span>
+                </div>
+              ) : availableCategories.length > 0 ? (
+                <div className="max-h-32 overflow-y-auto space-y-1 p-2 border border-white/30 rounded-md bg-black/50">
+                  {availableCategories.map((category) => (
+                    <div key={category.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`category-${category.id}`}
+                        checked={formData.categories.includes(category.name)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              categories: [...prev.categories, category.name]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              categories: prev.categories.filter(cat => cat !== category.name)
+                            }));
+                          }
+                        }}
+                        className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <Label 
+                        htmlFor={`category-${category.id}`} 
+                        className="text-white text-sm cursor-pointer flex-1"
+                      >
+                        {category.parentName ? `${category.parentName} > ${category.name}` : category.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-3 border border-white/30 rounded-md bg-black/50">
+                  <p className="text-gray-400 text-sm">No categories available. Please create categories first.</p>
+                  <Input
+                    value={formData.categories.join(', ')}
+                    onChange={(e) => handleArrayInput('categories', e.target.value)}
+                    placeholder="Enter categories manually (comma-separated)"
+                    className="mt-2 border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
+                  />
+                </div>
+              )}
+              {formData.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {formData.categories.map((category, index) => (
+                    <Badge 
+                      key={index} 
+                      variant="secondary"
+                      className="bg-white text-black hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          categories: prev.categories.filter(cat => cat !== category)
+                        }));
+                      }}
+                    >
+                      {category} ×
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand</Label>
+            <Label htmlFor="brand" className="text-white">Brand</Label>
             <Input
               id="brand"
               value={formData.brand}
               onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
               placeholder="Enter brand name"
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="colors">Colors (comma-separated)</Label>
+            <Label htmlFor="colors" className="text-white">Colors (comma-separated)</Label>
             <Input
               id="colors"
               value={formData.colors?.join(', ') || ''}
               onChange={(e) => handleArrayInput('colors', e.target.value)}
               placeholder="Black, White, Red"
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sizes">Sizes (comma-separated)</Label>
+            <Label htmlFor="sizes" className="text-white">Sizes (comma-separated)</Label>
             <Input
               id="sizes"
               value={formData.sizes?.join(', ') || ''}
               onChange={(e) => handleArrayInput('sizes', e.target.value)}
               placeholder="S, M, L, XL"
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-white/20" />
 
       {/* Product Details */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Product Details</h3>
+        <h3 className="text-lg font-semibold text-white">Product Details</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="material">Material</Label>
+            <Label htmlFor="material" className="text-white">Material</Label>
             <Input
               id="material"
               value={formData.material}
               onChange={(e) => setFormData(prev => ({ ...prev, material: e.target.value }))}
               placeholder="Cotton, Polyester, etc."
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dimensions">Dimensions</Label>
+            <Label htmlFor="dimensions" className="text-white">Dimensions</Label>
             <Input
               id="dimensions"
               value={formData.dimensions}
               onChange={(e) => setFormData(prev => ({ ...prev, dimensions: e.target.value }))}
               placeholder="Length x Width x Height"
+              className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="careInstructions">Care Instructions</Label>
+          <Label htmlFor="careInstructions" className="text-white">Care Instructions</Label>
           <Textarea
             id="careInstructions"
             value={formData.careInstructions}
@@ -515,11 +643,38 @@ export function ProductManagement() {
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-white/20" />
+
+      {/* Stock Management & Variants */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">Stock Management & Variants</h3>
+        
+        <VariantStockManager
+          variants={formData.variants || []}
+          onVariantsChange={(variants) => {
+            setFormData(prev => ({
+              ...prev,
+              variants,
+              // Auto-calculate total stock from variants
+              stockQuantity: variants.reduce((total, variant) => {
+                if (variant.isUnlimitedStock) return total + 999999;
+                return total + (variant.stockQuantity || 0);
+              }, 0),
+              // Update sizes and colors based on variants
+              sizes: Array.from(new Set(variants.map(v => v.size))).filter(Boolean),
+              colors: Array.from(new Set(variants.map(v => v.color))).filter(Boolean)
+            }));
+          }}
+          availableSizes={defaultSizes}
+          availableColors={defaultColors}
+        />
+      </div>
+
+      <Separator className="bg-white/20" />
 
       {/* SEO & Marketing */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">SEO & Marketing</h3>
+        <h3 className="text-lg font-semibold text-white">SEO & Marketing</h3>
         
         <div className="space-y-2">
           <Label htmlFor="tags">Tags (comma-separated)</Label>
@@ -594,25 +749,30 @@ export function ProductManagement() {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-4xl bg-black/95 border-white/20 text-white">
             <DialogHeader>
-              <DialogTitle>Create New Product</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-white">Create New Product</DialogTitle>
+              <DialogDescription className="text-gray-300">
                 Add a new product to your catalog. Fill in all required fields marked with *.
               </DialogDescription>
             </DialogHeader>
             
             <ProductForm />
             
-            <div className="flex justify-end space-x-2 pt-4 border-t">
+            <div className="flex justify-end space-x-2 pt-4 border-t border-white/20">
               <Button
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
                 disabled={isSubmitting}
+                className="border-white/30 text-white hover:bg-white/10 hover:border-white/50"
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreateProduct} disabled={isSubmitting}>
+              <Button 
+                onClick={handleCreateProduct} 
+                disabled={isSubmitting}
+                className="bg-white text-black hover:bg-gray-200 border border-white"
+              >
                 {isSubmitting ? (
                   <>
                     <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />
@@ -638,8 +798,9 @@ export function ProductManagement() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  className="border-white/30 bg-black/50 text-white placeholder:text-gray-400 focus:border-white/70"
                 />
-                <Button onClick={handleSearch} variant="outline">
+                <Button onClick={handleSearch} variant="outline" className="border-white/30 text-white hover:bg-white/10 hover:border-white/50">
                   <Icons.search className="w-4 h-4" />
                 </Button>
               </div>
@@ -647,7 +808,7 @@ export function ProductManagement() {
             
             <div className="flex gap-2">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 border-white/30 bg-black/50 text-white focus:border-white/70">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -919,25 +1080,30 @@ export function ProductManagement() {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl bg-black/95 border-white/20 text-white">
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Edit Product</DialogTitle>
+            <DialogDescription className="text-gray-300">
               Update product information. Fill in all required fields marked with *.
             </DialogDescription>
           </DialogHeader>
           
           <ProductForm isEdit={true} />
           
-          <div className="flex justify-end space-x-2 pt-4 border-t">
+          <div className="flex justify-end space-x-2 pt-4 border-t border-white/20">
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
               disabled={isSubmitting}
+              className="border-white/30 text-white hover:bg-white/10 hover:border-white/50"
             >
               Cancel
             </Button>
-            <Button onClick={handleUpdateProduct} disabled={isSubmitting}>
+            <Button 
+              onClick={handleUpdateProduct} 
+              disabled={isSubmitting}
+              className="bg-white text-black hover:bg-gray-200 border border-white"
+            >
               {isSubmitting ? (
                 <>
                   <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />

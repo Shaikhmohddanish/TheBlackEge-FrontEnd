@@ -79,7 +79,6 @@ export class SearchAPI {
       const data = await response.json();
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch search suggestions:', error);
       return [];
     }
   }
@@ -138,7 +137,6 @@ export class SearchAPI {
         }
       };
     } catch (error) {
-      console.error('Failed to search products:', error);
       throw error;
     }
   }
@@ -159,7 +157,6 @@ export class SearchAPI {
       const data = await response.json();
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch trending searches:', error);
       return [];
     }
   }
@@ -180,7 +177,6 @@ export class SearchAPI {
       const data = await response.json();
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch popular categories:', error);
       return [];
     }
   }
@@ -212,7 +208,6 @@ export class SearchAPI {
         ] : [0, 1000]
       };
     } catch (error) {
-      console.error('Failed to fetch available filters:', error);
       return {
         categories: [],
         brands: [],
@@ -241,7 +236,6 @@ export class SearchAPI {
       const data = await response.json();
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch autocomplete:', error);
       return [];
     }
   }
@@ -275,7 +269,6 @@ export class SearchAPI {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Failed to track search interaction:', error);
     }
   }
 
@@ -295,7 +288,6 @@ export class SearchAPI {
       const data = await response.json();
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch related searches:', error);
       return [];
     }
   }

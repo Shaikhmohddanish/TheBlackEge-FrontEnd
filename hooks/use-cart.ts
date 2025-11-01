@@ -41,7 +41,6 @@ export const useCart = (): UseCartReturn => {
     // Extra check for token existence and validity before making API call
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) {
-      console.log('Cart: No token available, skipping cart fetch');
       setCart(null);
       return;
     }
@@ -49,7 +48,6 @@ export const useCart = (): UseCartReturn => {
     // Import tokenManager dynamically to avoid SSR issues
     const { tokenManager } = await import('@/lib/api-client');
     if (tokenManager.isTokenExpired(token)) {
-      console.log('Cart: Token is expired, skipping cart fetch');
       setCart(null);
       setError('Your session has expired. Please log in again.');
       return;
@@ -63,13 +61,11 @@ export const useCart = (): UseCartReturn => {
     } catch (err) {
       // Handle auth failures gracefully - don't clear auth but log the issue
       if (err instanceof Error && (err.message.includes('401') || err.message.includes('Unauthorized'))) {
-        console.log('Cart fetch failed due to auth - backend rejected token but keeping user logged in');
         setCart(null); // Set null cart to avoid errors
         setError('Cart temporarily unavailable - please try refreshing');
       } else {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch cart';
         setError(errorMessage);
-        console.error('Failed to fetch cart:', err);
       }
     } finally {
       setIsLoading(false);

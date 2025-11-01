@@ -1,5 +1,25 @@
 import { makeAuthenticatedRequest, handleAPIResponse, API_BASE_URL } from '@/lib/api-client';
 
+export interface ProductVariant {
+  id?: string;
+  size: string;
+  color: string;
+  colorCode?: string;
+  stockQuantity: number;
+  reservedQuantity?: number;
+  availableQuantity?: number;
+  lowStockThreshold?: number;
+  reorderPoint?: number;
+  costPrice?: number;
+  additionalPrice?: number;
+  weight?: number;
+  skuCode?: string;
+  isActive?: boolean;
+  isUnlimitedStock?: boolean;
+  supplierCode?: string;
+  barcode?: string;
+}
+
 export interface ProductFormData {
   name: string;
   description: string;
@@ -20,6 +40,7 @@ export interface ProductFormData {
   seoTitle?: string;
   seoDescription?: string;
   images?: string[];
+  variants?: ProductVariant[]; // New field for variant management
 }
 
 export interface AdminProduct {
@@ -43,6 +64,7 @@ export interface AdminProduct {
   seoTitle?: string;
   seoDescription?: string;
   images?: string[];
+  variants?: ProductVariant[]; // New field for variant management
   createdAt: string;
   updatedAt: string;
   createdBy?: string;
@@ -74,7 +96,6 @@ export const createProduct = async (productData: ProductFormData): Promise<Admin
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to create product:', error);
     throw error;
   }
 };
@@ -92,7 +113,6 @@ export const updateProduct = async (id: string, productData: ProductFormData): P
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update product:', error);
     throw error;
   }
 };
@@ -108,7 +128,6 @@ export const deleteProduct = async (id: string): Promise<void> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to delete product:', error);
     throw error;
   }
 };
@@ -119,7 +138,6 @@ export const getProductById = async (id: string): Promise<AdminProduct> => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/products/${id}`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch product:', error);
     throw error;
   }
 };
@@ -151,7 +169,6 @@ export const getAdminProducts = async (
       pageSize: data.size || size,
     };
   } catch (error) {
-    console.error('Failed to fetch admin products:', error);
     throw error;
   }
 };
@@ -185,7 +202,6 @@ export const searchAdminProducts = async (
       pageSize: data.size || size,
     };
   } catch (error) {
-    console.error('Failed to search admin products:', error);
     throw error;
   }
 };
@@ -196,7 +212,6 @@ export const toggleProductStatus = async (id: string, isActive: boolean): Promis
     const product = await getProductById(id);
     return await updateProduct(id, { ...product, isActive });
   } catch (error) {
-    console.error('Failed to toggle product status:', error);
     throw error;
   }
 };
@@ -207,7 +222,6 @@ export const bulkDeleteProducts = async (productIds: string[]): Promise<void> =>
     const deletePromises = productIds.map(id => deleteProduct(id));
     await Promise.all(deletePromises);
   } catch (error) {
-    console.error('Failed to bulk delete products:', error);
     throw error;
   }
 };
@@ -217,7 +231,6 @@ export const bulkUpdateProductStatus = async (productIds: string[], isActive: bo
     const updatePromises = productIds.map(id => toggleProductStatus(id, isActive));
     await Promise.all(updatePromises);
   } catch (error) {
-    console.error('Failed to bulk update product status:', error);
     throw error;
   }
 };

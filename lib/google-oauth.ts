@@ -204,7 +204,6 @@ export const useGoogleOAuth = () => {
       await googleOAuth.initialize(callback);
       return true;
     } catch (error) {
-      console.error('Failed to initialize Google OAuth:', error);
       return false;
     }
   };
@@ -214,7 +213,6 @@ export const useGoogleOAuth = () => {
       googleOAuth.renderButton(element, options);
       return true;
     } catch (error) {
-      console.error('Failed to render Google button:', error);
       return false;
     }
   };
@@ -223,7 +221,6 @@ export const useGoogleOAuth = () => {
     try {
       return googleOAuth.parseCredential(credential);
     } catch (error) {
-      console.error('Failed to parse Google credential:', error);
       return null;
     }
   };

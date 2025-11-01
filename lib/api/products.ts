@@ -145,7 +145,6 @@ export const getProducts = async (
            (fetchError as Error).message.includes('fetch'))
         )
       ) {
-        console.log('Backend connection timed out or failed, returning empty results');
         return {
           products: [],
           totalPages: 0,
@@ -157,7 +156,6 @@ export const getProducts = async (
       throw fetchError;
     }
   } catch (error) {
-    console.error('Failed to fetch products:', error);
     // Return empty results for any error to avoid breaking the UI
     return {
       products: [],
@@ -183,7 +181,6 @@ export const getProduct = async (productId: string): Promise<Product> => {
     apiCache.set(cacheKey, transformedProduct);
     return transformedProduct;
   } catch (error) {
-    console.error('Failed to fetch product:', error);
     throw error;
   }
 };
@@ -202,7 +199,6 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     apiCache.set(cacheKey, transformedProduct);
     return transformedProduct;
   } catch (error) {
-    console.error('Failed to fetch product by slug:', error);
     throw error;
   }
 };
@@ -228,7 +224,6 @@ export const searchProducts = async (
       size: data.size || 0,
     };
   } catch (error) {
-    console.error('Search failed:', error);
     throw error;
   }
 };
@@ -261,7 +256,6 @@ export const filterProducts = async (filters: ProductFilter): Promise<ProductsRe
       size: data.size || 0,
     };
   } catch (error) {
-    console.error('Filter failed:', error);
     throw error;
   }
 };
@@ -287,7 +281,6 @@ export const getProductsByCategory = async (
       size: data.size || 0,
     };
   } catch (error) {
-    console.error('Failed to fetch products by category:', error);
     throw error;
   }
 };
@@ -305,7 +298,6 @@ export const getCategories = async (): Promise<string[]> => {
     apiCache.set(cacheKey, categories, 600000); // Cache for 10 minutes
     return categories;
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
     throw error;
   }
 };
@@ -325,7 +317,6 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
     
     return product;
   } catch (error) {
-    console.error('Failed to create product:', error);
     throw error;
   }
 };
@@ -349,7 +340,6 @@ export const updateProduct = async (
     
     return product;
   } catch (error) {
-    console.error('Failed to update product:', error);
     throw error;
   }
 };
@@ -367,7 +357,6 @@ export const deleteProduct = async (productId: string): Promise<void> => {
     apiCache.delete(`product_${productId}`);
     apiCache.clear();
   } catch (error) {
-    console.error('Failed to delete product:', error);
     throw error;
   }
 };
@@ -403,7 +392,6 @@ export const uploadProductMedia = async (
     
     return media;
   } catch (error) {
-    console.error('Failed to upload media:', error);
     throw error;
   }
 };

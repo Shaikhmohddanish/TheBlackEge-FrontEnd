@@ -38,7 +38,6 @@ export default function WishlistPage() {
       const data = await getDefaultWishlist(userId);
       setWishlist(data);
     } catch (error) {
-      console.error('Failed to load wishlist:', error);
       toast.error('Failed to load wishlist');
     } finally {
       setLoading(false);
@@ -53,7 +52,6 @@ export default function WishlistPage() {
       setWishlist(updatedWishlist);
       toast.success('Item removed from wishlist');
     } catch (error) {
-      console.error('Failed to remove item:', error);
       toast.error('Failed to remove item');
     }
   };
@@ -166,12 +164,12 @@ export default function WishlistPage() {
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
           />
         </div>
         
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger>
+          <SelectTrigger className="border-white bg-gray-900/50 text-white focus:border-blue-400">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>

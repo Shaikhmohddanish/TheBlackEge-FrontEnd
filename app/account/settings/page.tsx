@@ -243,6 +243,7 @@ export default function SettingsPage() {
                       id="firstName"
                       value={profileData.firstName}
                       onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div className="space-y-2">
@@ -251,6 +252,7 @@ export default function SettingsPage() {
                       id="lastName"
                       value={profileData.lastName}
                       onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                 </div>
@@ -262,6 +264,7 @@ export default function SettingsPage() {
                     type="email"
                     value={profileData.email}
                     onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -273,6 +276,7 @@ export default function SettingsPage() {
                     value={profileData.phoneNumber}
                     onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
                     placeholder="(555) 123-4567"
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
 
@@ -284,12 +288,13 @@ export default function SettingsPage() {
                       type="date"
                       value={profileData.dateOfBirth}
                       onChange={(e) => setProfileData({...profileData, dateOfBirth: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
                     <Select value={profileData.gender} onValueChange={(value) => setProfileData({...profileData, gender: value})}>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-white bg-gray-900/50 text-white focus:border-blue-400">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
@@ -433,6 +438,7 @@ export default function SettingsPage() {
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
 
@@ -444,6 +450,7 @@ export default function SettingsPage() {
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
 
@@ -455,6 +462,7 @@ export default function SettingsPage() {
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
 

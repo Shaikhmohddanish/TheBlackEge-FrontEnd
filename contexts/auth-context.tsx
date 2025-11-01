@@ -26,6 +26,17 @@ interface User {
   // Computed properties for convenience
   firstName?: string;
   lastName?: string;
+  // Address information
+  address?: {
+    fullName?: string;
+    addressLine1?: string;
+    addressLine2?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    phoneNumber?: string;
+  };
 }
 
 interface AuthContextType {
@@ -65,28 +76,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Check if user is authenticated on mount
     const checkAuth = () => {
       try {
-        console.log('AuthProvider: Checking authentication on mount...');
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-        
-        console.log('AuthProvider: Token exists:', !!token);
-        console.log('AuthProvider: User exists:', !!storedUser);
         
         if (token && storedUser) {
           try {
             const currentUser = JSON.parse(storedUser);
-            console.log('AuthProvider: Setting user from storage:', currentUser);
             setUser(processUserData(currentUser));
           } catch (parseError) {
-            console.error('AuthProvider: Failed to parse stored user:', parseError);
             setUser(null);
           }
         } else {
-          console.log('AuthProvider: No stored auth data found');
           setUser(null);
         }
       } catch (error) {
-        console.error('AuthProvider: Auth check failed:', error);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -99,24 +102,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      setIsLoading(true);
-      console.log('Auth context: Starting login');
       const response = await loginUser(credentials);
-      console.log('Auth context: Login API response received');
       
-      if (response.success && response.user) {
-        const userData = processUserData(response.user);
-        console.log('Auth context: Setting user data', userData);
-        setUser(userData);
+      if (response.success && response.token && response.user) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        setUser(processUserData(response.user));
       }
       
       return response;
     } catch (error) {
-      console.error('Login failed:', error);
-      setUser(null);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -127,7 +123,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(processUserData(response.user));
       return response;
     } catch (error) {
-      console.error('Registration failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -140,8 +135,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await logoutUser();
       setUser(null);
     } catch (error) {
-      console.error('Logout failed:', error);
-      // Still clear user state even if logout fails
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -151,14 +144,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const googleLogin = async (googleData: GoogleAuthData): Promise<AuthResponse> => {
     try {
       setIsLoading(true);
-      console.log('Google login starting...');
       const response = await loginWithGoogle(googleData);
-      console.log('Google login response:', response);
       setUser(processUserData(response.user));
-      console.log('User set in context:', processUserData(response.user));
       return response;
     } catch (error) {
-      console.error('Google login failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -172,7 +161,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(processUserData(response.user));
       return response;
     } catch (error) {
-      console.error('Google registration failed:', error);
       throw error;
     } finally {
       setIsLoading(false);

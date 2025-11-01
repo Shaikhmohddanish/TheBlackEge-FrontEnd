@@ -167,7 +167,6 @@ export function extractPublicIdFromUrl(url: string): string | null {
     const publicIdPart = urlParts[uploadIndex + 2];
     return publicIdPart.split('.')[0]; // Remove file extension
   } catch (error) {
-    console.error('Error extracting public ID from URL:', error);
     return null;
   }
 }

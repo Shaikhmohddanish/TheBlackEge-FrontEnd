@@ -53,7 +53,6 @@ export function HeroSearchSection({
           setTrendingSearches(results[showCategories ? 1 : 0] || []);
         }
       } catch (error) {
-        console.error('Failed to load search data:', error);
       } finally {
         setIsLoading(false);
       }

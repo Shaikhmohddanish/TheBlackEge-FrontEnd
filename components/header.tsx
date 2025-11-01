@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -44,9 +44,8 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
-      console.log('Starting logout process...')
+
       await logout()
-      console.log('Logout successful, showing toast and redirecting...')
       
       // Show success toast (it will auto-dismiss after 3 seconds due to TOAST_REMOVE_DELAY)
       toast({
@@ -60,7 +59,6 @@ export function Header() {
       }, 500) // Small delay to show toast briefly before redirect
       
     } catch (error) {
-      console.error('Logout error:', error)
       toast({
         title: "Error", 
         description: "Failed to logout. Please try again.",
@@ -68,6 +66,22 @@ export function Header() {
       })
     }
   }
+
+  // Add keyboard shortcut for search (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(true)
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isSearchOpen])
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -110,14 +124,27 @@ export function Header() {
                   placeholder="Search streetwear, brands, collections..."
                   className="w-80"
                   showTrending={true}
+                  onSearchSubmit={(query) => {
+                    router.push(`/shop?search=${encodeURIComponent(query)}`);
+                    setIsSearchOpen(false);
+                  }}
                 />
                 <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)}>
                   <Icons.x className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} className="hover-glow">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsSearchOpen(true)} 
+                className="hover-glow relative group"
+                title="Search (Ctrl+K)"
+              >
                 <Icons.search className="h-5 w-5" />
+                <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  ⌘K
+                </span>
               </Button>
             )}
           </div>
@@ -224,14 +251,18 @@ export function Header() {
                 Contact
               </Link>
               <div className="pt-4">
-                <form onSubmit={handleSearch}>
+                <form onSubmit={handleSearch} className="space-y-2">
                   <Input 
                     type="search" 
-                    placeholder="Search products..." 
+                    placeholder="Search streetwear, brands, collections..." 
                     className="w-full bg-card border-border"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                  <Button type="submit" size="sm" className="w-full">
+                    <Icons.search className="mr-2 h-4 w-4" />
+                    Search
+                  </Button>
                 </form>
               </div>
               {!isAuthenticated && (

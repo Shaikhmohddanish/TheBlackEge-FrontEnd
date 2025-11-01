@@ -180,6 +180,7 @@ export default function CheckoutPage() {
                       value={shippingAddress.firstName}
                       onChange={(e) => setShippingAddress({...shippingAddress, firstName: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div>
@@ -189,6 +190,7 @@ export default function CheckoutPage() {
                       value={shippingAddress.lastName}
                       onChange={(e) => setShippingAddress({...shippingAddress, lastName: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                 </div>
@@ -200,6 +202,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.email}
                     onChange={(e) => setShippingAddress({...shippingAddress, email: e.target.value})}
                     required
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
                 <div>
@@ -209,6 +212,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.phone}
                     onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
                     required
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
                 <div>
@@ -218,6 +222,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.address}
                     onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
                     required
+                    className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
@@ -228,6 +233,7 @@ export default function CheckoutPage() {
                       value={shippingAddress.city}
                       onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div>
@@ -237,6 +243,7 @@ export default function CheckoutPage() {
                       value={shippingAddress.state}
                       onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div>
@@ -246,6 +253,7 @@ export default function CheckoutPage() {
                       value={shippingAddress.pincode}
                       onChange={(e) => setShippingAddress({...shippingAddress, pincode: e.target.value})}
                       required
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                 </div>
@@ -276,6 +284,7 @@ export default function CheckoutPage() {
                         id="billingFirstName"
                         value={billingAddress.firstName}
                         onChange={(e) => setBillingAddress({...billingAddress, firstName: e.target.value})}
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
                     <div>
@@ -284,6 +293,7 @@ export default function CheckoutPage() {
                         id="billingLastName"
                         value={billingAddress.lastName}
                         onChange={(e) => setBillingAddress({...billingAddress, lastName: e.target.value})}
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
                   </div>
@@ -294,6 +304,7 @@ export default function CheckoutPage() {
                       type="email"
                       value={billingAddress.email}
                       onChange={(e) => setBillingAddress({...billingAddress, email: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div>
@@ -302,6 +313,7 @@ export default function CheckoutPage() {
                       id="billingPhone"
                       value={billingAddress.phone}
                       onChange={(e) => setBillingAddress({...billingAddress, phone: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div>
@@ -310,6 +322,7 @@ export default function CheckoutPage() {
                       id="billingAddress"
                       value={billingAddress.address}
                       onChange={(e) => setBillingAddress({...billingAddress, address: e.target.value})}
+                      className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-4">
@@ -319,6 +332,7 @@ export default function CheckoutPage() {
                         id="billingCity"
                         value={billingAddress.city}
                         onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
                     <div>
@@ -327,6 +341,7 @@ export default function CheckoutPage() {
                         id="billingState"
                         value={billingAddress.state}
                         onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
                     <div>
@@ -335,6 +350,7 @@ export default function CheckoutPage() {
                         id="billingPincode"
                         value={billingAddress.pincode}
                         onChange={(e) => setBillingAddress({...billingAddress, pincode: e.target.value})}
+                        className="border-white bg-gray-900/50 text-white placeholder:text-gray-400 focus:border-blue-400"
                       />
                     </div>
                   </div>

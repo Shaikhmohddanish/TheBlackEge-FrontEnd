@@ -34,7 +34,6 @@ export const getCart = async (): Promise<Cart> => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/cart`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch cart:', error);
     throw error;
   }
 };
@@ -57,7 +56,6 @@ export const addToCart = async (
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to add to cart:', error);
     throw error;
   }
 };
@@ -74,7 +72,6 @@ export const updateCartItem = async (itemId: string, quantity: number): Promise<
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update cart item:', error);
     throw error;
   }
 };
@@ -88,7 +85,6 @@ export const removeFromCart = async (itemId: string): Promise<Cart> => {
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to remove from cart:', error);
     throw error;
   }
 };
@@ -106,7 +102,6 @@ export const clearCart = async (): Promise<{ success: boolean }> => {
 
     throw new Error('Failed to clear cart');
   } catch (error) {
-    console.error('Failed to clear cart:', error);
     throw error;
   }
 };

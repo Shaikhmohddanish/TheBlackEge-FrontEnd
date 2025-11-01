@@ -20,8 +20,9 @@ import { ProductManagement } from '@/components/admin/product-management';
 import { OrderManagement } from '@/components/admin/order-management';
 import { CouponManagement } from '@/components/admin/CouponManagement';
 import { EnhancedUserManagement } from '@/components/admin/enhanced-user-management';
+import CategoryManagement from '@/components/admin/CategoryManagement';
 import { getAllUsers, getDashboardSummary, type AdminUser, type DashboardSummary } from '@/lib/api/admin';
-import { getCurrentUserInfo, type DebugUserInfo } from '@/lib/api/debug';
+
 import type { Product } from '@/lib/api/products';
 import type { Order } from '@/lib/api/orders';
 import { formatPrice } from '@/lib/currency-utils';
@@ -38,56 +39,9 @@ export default function AdminDashboard() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<DebugUserInfo | null>(null);
 
-  const handleDebugCheck = async () => {
-    try {
-      const info = await getCurrentUserInfo();
-      setDebugInfo(info);
-      
-      // Get local storage data
-      const localToken = localStorage.getItem('token');
-      const localUser = localStorage.getItem('user');
-      
-      console.log('=== ADMIN ACCESS DEBUG ===');
-      console.log('Backend User Info:', info);
-      console.log('Local Storage Token:', localToken);
-      console.log('Local Storage User:', localUser);
-      
-      if (localUser) {
-        try {
-          const parsedUser = JSON.parse(localUser);
-          console.log('Parsed Local User:', parsedUser);
-          console.log('Local User Roles:', parsedUser.roles);
-          console.log('Has ROLE_ADMIN locally:', parsedUser.roles?.includes('ROLE_ADMIN'));
-        } catch (parseError) {
-          console.error('Failed to parse stored user:', parseError);
-        }
-      }
-      
-      console.log('Auth Context State:', {
-        authLoading,
-        isAuthenticated,
-        isAdmin,
-        user: user,
-        userRoles: user?.roles
-      });
-      console.log('========================');
-      
-      toast({
-        title: 'Debug Info Updated',
-        description: `Admin Status: ${isAdmin ? 'GRANTED' : 'DENIED'}. Check browser console for details.`,
-        variant: isAdmin ? 'default' : 'destructive',
-      });
-    } catch (error) {
-      console.error('Debug check failed:', error);
-      toast({
-        title: 'Debug Check Failed',
-        description: 'Could not get debug information. Check console for details.',
-        variant: 'destructive',
-      });
-    }
-  };
+
+
 
   // Product form state
   const [newProduct, setNewProduct] = useState({
@@ -110,14 +64,6 @@ export default function AdminDashboard() {
     }
 
     if (!isAdmin) {
-      // Don't redirect immediately, let user see the debug info
-      console.log('Admin access denied:', {
-        user: user,
-        isAuthenticated,
-        isAdmin,
-        userRoles: user?.roles,
-        expectedRole: 'ROLE_ADMIN'
-      });
       return;
     }
 
@@ -127,49 +73,30 @@ export default function AdminDashboard() {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Starting to load dashboard data...');
-      console.log('Auth state check:', { isAuthenticated, isAdmin, user: user?.email });
       
-      // Check token first
       const token = localStorage.getItem('token');
-      console.log('Token available:', !!token);
-      if (token) {
-        console.log('Token preview:', token.substring(0, 20) + '...');
-      }
       
-      // Load each dataset individually to see which one fails
       try {
-        console.log('📦 Loading products...');
         const productsData = await getProducts(0, 50);
-        console.log('✅ Products loaded:', productsData);
         setProducts(productsData.products);
       } catch (error) {
-        console.error('❌ Products failed:', error);
         setProducts([]);
       }
       
       try {
-        console.log('📋 Loading orders...');
         const ordersData = await getAllOrders(0, 50);
-        console.log('✅ Orders loaded:', ordersData);
         setOrders(ordersData.orders);
       } catch (error) {
-        console.error('❌ Orders failed:', error);
         setOrders([]);
       }
       
       try {
-        console.log('👥 Loading users...');
         const usersData = await getAllUsers(0, 50);
-        console.log('✅ Users loaded:', usersData);
         setUsers(usersData.users);
         
         try {
-          console.log('📊 Loading dashboard summary...');
           const summaryData = await getDashboardSummary();
-          console.log('✅ Dashboard summary loaded:', summaryData);
           
-          // If dashboard summary is missing or has wrong data, create a fallback
           const enhancedSummary = {
             ...summaryData,
             totalUsers: summaryData?.totalUsers || usersData.totalElements || usersData.users.length,
@@ -178,12 +105,8 @@ export default function AdminDashboard() {
             totalOrders: summaryData?.totalOrders || orders.length,
           };
           
-          console.log('Enhanced summary with fallbacks:', enhancedSummary);
           setDashboardSummary(enhancedSummary);
         } catch (summaryError) {
-          console.error('❌ Dashboard summary failed:', summaryError);
-          
-          // Create fallback summary from loaded data
           const fallbackSummary = {
             totalUsers: usersData.totalElements || usersData.users.length,
             activeUsers: usersData.users.filter((u: AdminUser) => u.enabled).length,
@@ -197,22 +120,16 @@ export default function AdminDashboard() {
             topSellingCategory: 'N/A',
           };
           
-          console.log('Using fallback summary:', fallbackSummary);
           setDashboardSummary(fallbackSummary);
         }
         
       } catch (usersError) {
-        console.error('❌ Users failed:', usersError);
         setUsers([]);
         
-        // Still try to load summary
         try {
-          console.log('📊 Loading dashboard summary (users failed)...');
           const summaryData = await getDashboardSummary();
-          console.log('✅ Dashboard summary loaded:', summaryData);
           setDashboardSummary(summaryData);
         } catch (summaryError) {
-          console.error('❌ Dashboard summary also failed:', summaryError);
           setDashboardSummary({
             totalUsers: 0,
             activeUsers: 0,
@@ -228,7 +145,6 @@ export default function AdminDashboard() {
         }
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
       toast({
         title: 'Error',
         description: 'Failed to load dashboard data.',
@@ -303,14 +219,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Debug logging for authentication
-  console.log('Admin Dashboard Debug:', {
-    authLoading,
-    isAuthenticated,
-    isAdmin,
-    user,
-    userRoles: user?.roles
-  });
+
 
   // Show loading while auth is being determined
   if (authLoading) {
@@ -355,27 +264,7 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Admin Access Required</h1>
             <p className="text-gray-600 mb-4">You need admin privileges to access this dashboard.</p>
             
-            {/* Debug Information */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
-              <h3 className="text-sm font-medium text-red-800 mb-2">Debug Information:</h3>
-              <div className="text-xs text-red-700 space-y-1">
-                <p><strong>Username:</strong> {user?.username || 'N/A'}</p>
-                <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
-                <p><strong>User Roles:</strong> {user?.roles?.join(', ') || 'None'}</p>
-                <p><strong>Is Authenticated:</strong> {isAuthenticated ? 'Yes' : 'No'}</p>
-                <p><strong>Is Admin:</strong> {isAdmin ? 'Yes' : 'No'}</p>
-                <p><strong>Expected Role:</strong> ROLE_ADMIN</p>
-              </div>
-            </div>
-            
-            <p className="text-sm text-gray-500 mb-8">
-              If you believe this is an error, please check the debug information above.
-            </p>
-            
             <div className="space-x-4">
-              <Button onClick={handleDebugCheck} variant="outline">
-                Debug Admin Access
-              </Button>
               <Button onClick={() => router.push('/account')}>Go to Account</Button>
             </div>
           </div>
@@ -406,83 +295,7 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
           <p className="text-gray-600">Manage your store products and orders</p>
           
-          {/* Debug Section */}
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-blue-900">Debug Information</h3>
-                <p className="text-xs text-blue-700">Check your admin access and user roles</p>
-              </div>
-              <div className="space-x-2">
-                <Button 
-                  onClick={handleDebugCheck}
-                  variant="outline" 
-                  size="sm"
-                  className="text-blue-700 border-blue-300 hover:bg-blue-100"
-                >
-                  Check Admin Access
-                </Button>
-                <Button 
-                  onClick={() => {
-                    console.log('Refreshing dashboard data...');
-                    loadDashboardData();
-                  }}
-                  variant="outline" 
-                  size="sm"
-                  className="text-green-700 border-green-300 hover:bg-green-100"
-                >
-                  Refresh Data
-                </Button>
-                <Button 
-                  onClick={async () => {
-                    console.log('Clearing backend cache...');
-                    try {
-                      const token = localStorage.getItem('token');
-                      const response = await fetch('http://localhost:8080/api/admin/dashboard/cache/clear', {
-                        method: 'POST',
-                        headers: {
-                          'Authorization': `Bearer ${token}`,
-                        },
-                      });
-                      if (response.ok) {
-                        console.log('✅ Cache cleared successfully');
-                        toast({
-                          title: 'Cache Cleared',
-                          description: 'Dashboard cache has been cleared.',
-                        });
-                        // Refresh data after clearing cache
-                        loadDashboardData();
-                      } else {
-                        console.error('❌ Failed to clear cache:', response.status);
-                      }
-                    } catch (error) {
-                      console.error('❌ Cache clear error:', error);
-                    }
-                  }}
-                  variant="outline" 
-                  size="sm"
-                  className="text-red-700 border-red-300 hover:bg-red-100"
-                >
-                  Clear Cache
-                </Button>
-              </div>
-            </div>
-            
-            {debugInfo && (
-              <div className="mt-4 p-3 bg-white border border-blue-200 rounded text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <strong>User Info:</strong>
-                    <pre className="mt-1 text-xs">{JSON.stringify(debugInfo.user, null, 2)}</pre>
-                  </div>
-                  <div>
-                    <strong>Authorities:</strong>
-                    <pre className="mt-1 text-xs">{JSON.stringify(debugInfo.authorities, null, 2)}</pre>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+
         </div>
 
       {/* Dashboard Stats */}
@@ -543,8 +356,9 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="tracking">Tracking</TabsTrigger>
@@ -554,6 +368,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="products" className="mt-6">
           <ProductManagement />
+        </TabsContent>
+
+        <TabsContent value="categories" className="mt-6">
+          <CategoryManagement />
         </TabsContent>
 
         <TabsContent value="orders" className="mt-6">

@@ -58,13 +58,11 @@ export const tokenManager = {
       
       // Check if token has expired (exp is in seconds, Date.now() is in milliseconds)
       if (payload.exp && payload.exp * 1000 < Date.now()) {
-        console.log('Token is expired');
         return true;
       }
       
       return false;
     } catch (error) {
-      console.error('Error checking token expiration:', error);
       return true;
     }
   },
@@ -73,7 +71,6 @@ export const tokenManager = {
 // Note: Backend doesn't implement refresh tokens yet
 // For now, handle token expiration gracefully
 export const refreshToken = async (): Promise<string | null> => {
-  console.log('RefreshToken: Not doing anything to prevent logout loops');
   // Completely disable refresh token logic for now
   return null;
 };
@@ -94,22 +91,16 @@ export const makeAuthenticatedRequest = async (
     },
   };
 
-  // Debug log for auth issues
+
   if (url.includes('/cart') || url.includes('/wishlist') || url.includes('/admin')) {
-    console.log(`API Request: ${options.method || 'GET'} ${url}`);
-    console.log(`Auth Token: ${token ? 'Present (length: ' + token.length + ')' : 'Missing'}`);
     
     if (token) {
       try {
         const parts = token.split('.');
         if (parts.length === 3) {
           const payload = JSON.parse(atob(parts[1]));
-          console.log(`Token payload:`, payload);
-          console.log(`Token expires:`, new Date(payload.exp * 1000));
-          console.log(`Token expired:`, payload.exp * 1000 < Date.now());
         }
       } catch (e) {
-        console.error('Failed to decode token for debug:', e);
       }
     }
   }
@@ -118,7 +109,6 @@ export const makeAuthenticatedRequest = async (
 
   // If token expired, try to refresh
   if (response.status === 401) {
-    console.log('API call got 401, handling gracefully without clearing auth');
     // Don't try to refresh or clear tokens - just return the 401 response
     // This prevents the logout loop while keeping the user logged in
     return response;
@@ -226,7 +216,6 @@ export const apiClient = async (
     const data = await handleAPIResponse(response);
     return { data, status: response.status };
   } catch (error) {
-    console.error('API request failed:', error);
     throw error;
   }
 };

@@ -26,7 +26,6 @@ export default function ProductSlugPage({ params }: Props) {
         setProduct(productData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load product')
-        console.error('Failed to fetch product by slug:', err)
       } finally {
         setIsLoading(false)
       }

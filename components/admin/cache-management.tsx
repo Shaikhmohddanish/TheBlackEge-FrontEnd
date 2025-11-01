@@ -84,7 +84,6 @@ export function CacheManagement() {
       setLastCleaned(Date.now());
       await fetchStats();
     } catch (error) {
-      console.error('Error cleaning expired cache:', error);
     } finally {
       setIsCleaning(false);
     }
@@ -102,7 +101,6 @@ export function CacheManagement() {
       setLastCleaned(Date.now());
       await fetchStats();
     } catch (error) {
-      console.error('Error clearing all caches:', error);
     } finally {
       setIsClearing(false);
     }
@@ -117,7 +115,6 @@ export function CacheManagement() {
       await clearAll(type);
       await fetchStats();
     } catch (error) {
-      console.error(`Error clearing ${type}:`, error);
     }
   };
 

@@ -48,7 +48,6 @@ export const submitContactForm = async (formData: ContactFormData): Promise<Cont
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Contact form submission failed:', error);
     throw error;
   }
 };
@@ -67,7 +66,6 @@ export const getContactInfo = async (): Promise<{ success: boolean; data: Contac
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch contact info:', error);
     throw error;
   }
 };

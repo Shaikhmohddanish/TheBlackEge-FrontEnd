@@ -37,7 +37,6 @@ export function WishlistButton({
       const inWishlist = await isProductInWishlist(userId, productId);
       setIsInWishlist(inWishlist);
     } catch (error) {
-      console.error('Failed to check wishlist status:', error);
     } finally {
       setChecking(false);
     }
@@ -62,7 +61,6 @@ export function WishlistButton({
         toast.success('Added to wishlist');
       }
     } catch (error) {
-      console.error('Failed to toggle wishlist:', error);
       toast.error('Failed to update wishlist');
     } finally {
       setLoading(false);

@@ -375,7 +375,7 @@ export class BrowserStorageService {
     try {
       localStorage.setItem(key, JSON.stringify(entry));
     } catch (error) {
-      console.warn('localStorage quota exceeded, cleaning up...');
+
       this.cleanExpiredLocalStorage();
       localStorage.setItem(key, JSON.stringify(entry));
     }
@@ -386,7 +386,6 @@ export class BrowserStorageService {
       const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : null;
     } catch (error) {
-      console.error('Error reading from localStorage:', error);
       return null;
     }
   }
@@ -434,7 +433,7 @@ export class BrowserStorageService {
     try {
       sessionStorage.setItem(key, JSON.stringify(entry));
     } catch (error) {
-      console.warn('sessionStorage quota exceeded, cleaning up...');
+
       this.cleanExpiredSessionStorage();
       sessionStorage.setItem(key, JSON.stringify(entry));
     }
@@ -445,7 +444,6 @@ export class BrowserStorageService {
       const item = sessionStorage.getItem(key);
       return item ? JSON.parse(item) : null;
     } catch (error) {
-      console.error('Error reading from sessionStorage:', error);
       return null;
     }
   }

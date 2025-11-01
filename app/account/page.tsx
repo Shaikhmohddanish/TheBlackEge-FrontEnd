@@ -19,6 +19,8 @@ import { TrackingStatusBadge } from '@/components/tracking/status-badge';
 import { Icons } from '@/components/ui/icons';
 import type { Order } from '@/lib/api/orders';
 import { PasswordChangeForm } from '@/components/auth/password-change-form';
+import { AddressForm } from '@/components/user/address-form';
+import { updateUserAddress, type UserAddress } from '@/lib/api/user-profile';
 
 export default function AccountPage() {
   const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -26,6 +28,8 @@ export default function AccountPage() {
   const [orderTracking, setOrderTracking] = useState<Record<string, OrderTracking>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState<Record<string, boolean>>({});
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -46,7 +50,6 @@ export default function AccountPage() {
         const ordersData = await getUserOrders(0, 10);
         setOrders(ordersData.orders);
       } catch (error) {
-        console.error('Failed to fetch orders:', error);
         toast({
           title: 'Error',
           description: 'Failed to load your orders',
@@ -69,10 +72,32 @@ export default function AccountPage() {
       setOrderTracking(prev => ({ ...prev, [orderId]: tracking }));
     } catch (error) {
       // Silently fail - tracking might not be available for all orders
-      console.log(`No tracking data available for order ${orderId}`);
     } finally {
       setTrackingLoading(prev => ({ ...prev, [orderId]: false }));
     }
+  };
+
+  const handleAddressSubmit = async (addressData: UserAddress) => {
+    try {
+      await updateUserAddress(addressData);
+      // Refresh user data - you might need to add a refresh function to auth context
+      toast({
+        title: 'Success',
+        description: 'Address updated successfully',
+      });
+    } catch (error) {
+      throw error; // Let the form handle the error
+    }
+  };
+
+  const handleAddAddress = () => {
+    setIsEditingAddress(false);
+    setShowAddressForm(true);
+  };
+
+  const handleEditAddress = () => {
+    setIsEditingAddress(true);
+    setShowAddressForm(true);
   };
 
   const handleLogout = async () => {
@@ -84,7 +109,6 @@ export default function AccountPage() {
       });
       router.push('/');
     } catch (error) {
-      console.error('Logout failed:', error);
       toast({
         title: 'Error',
         description: 'Failed to logout. Please try again.',
@@ -143,32 +167,84 @@ export default function AccountPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>First Name</Label>
-                  <Input value={user.firstName} disabled />
+                  <Input value={user.firstName} disabled className="border-white bg-gray-900/30 text-gray-300" />
                 </div>
                 <div className="space-y-2">
                   <Label>Last Name</Label>
-                  <Input value={user.lastName} disabled />
+                  <Input value={user.lastName} disabled className="border-white bg-gray-900/30 text-gray-300" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>Username</Label>
-                <Input value={user.username} disabled />
+                <Input value={user.username} disabled className="border-white bg-gray-900/30 text-gray-300" />
               </div>
               <div className="space-y-2">
                 <Label>Email</Label>
-                <Input value={user.email} disabled />
+                <Input value={user.email} disabled className="border-white bg-gray-900/30 text-gray-300" />
               </div>
               <div className="space-y-2">
-                <Label>Role</Label>
-                <Badge variant={user.roles?.includes('ROLE_ADMIN') ? 'default' : 'secondary'}>
-                  {user.roles?.includes('ROLE_ADMIN') ? 'ADMIN' : 'USER'}
-                </Badge>
+                <Label>Phone</Label>
+                <Input value={user.phone || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
               </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Badge variant={user.enabled ? 'default' : 'destructive'}>
-                  {user.enabled ? 'Active' : 'Inactive'}
-                </Badge>
+              
+              {/* Address Section */}
+              <div className="border-t pt-4 mt-6">
+                <h4 className="text-lg font-medium mb-4">Address Information</h4>
+                {user.address ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Full Name</Label>
+                        <Input value={user.address.fullName || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Phone Number</Label>
+                        <Input value={user.address.phoneNumber || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Address Line 1</Label>
+                      <Input value={user.address.addressLine1 || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Address Line 2</Label>
+                      <Input value={user.address.addressLine2 || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>City</Label>
+                        <Input value={user.address.city || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>State</Label>
+                        <Input value={user.address.state || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Postal Code</Label>
+                        <Input value={user.address.postalCode || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Country</Label>
+                        <Input value={user.address.country || ''} disabled className="border-white bg-gray-900/30 text-gray-300" />
+                      </div>
+                    </div>
+                    <Button variant="outline" className="w-full mt-4" onClick={handleEditAddress}>
+                      <Icons.edit className="h-4 w-4 mr-2" />
+                      Edit Address
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                    <Icons.user className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-gray-500 mb-4">No address added yet</p>
+                    <Button onClick={handleAddAddress}>
+                      <Icons.plus className="h-4 w-4 mr-2" />
+                      Add Address
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -346,6 +422,15 @@ export default function AccountPage() {
         </Tabs>
       </main>
       <Footer />
+      
+      {/* Address Form Dialog */}
+      <AddressForm
+        isOpen={showAddressForm}
+        onClose={() => setShowAddressForm(false)}
+        onSave={handleAddressSubmit}
+        initialData={isEditingAddress ? user.address : undefined}
+        title={isEditingAddress ? "Edit Address" : "Add Address"}
+      />
     </div>
   );
 }

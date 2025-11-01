@@ -72,6 +72,46 @@ export interface OrderStatusUpdateRequest {
   notes?: string;
 }
 
+export enum TrackingEventType {
+  ORDER_PLACED = 'ORDER_PLACED',
+  PAYMENT_CONFIRMED = 'PAYMENT_CONFIRMED', 
+  ORDER_PROCESSING = 'ORDER_PROCESSING',
+  ORDER_SHIPPED = 'ORDER_SHIPPED',
+  IN_TRANSIT = 'IN_TRANSIT',
+  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
+  DELIVERED = 'DELIVERED',
+  DELIVERY_ATTEMPTED = 'DELIVERY_ATTEMPTED',
+  RETURNED_TO_SENDER = 'RETURNED_TO_SENDER',
+  EXCEPTION = 'EXCEPTION',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED'
+}
+
+export interface TrackingEvent {
+  id: string;
+  eventType: TrackingEventType;
+  description: string;
+  location?: string;
+  eventDate: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface AddTrackingEventRequest {
+  eventType: TrackingEventType;
+  description: string;
+  location?: string;
+  eventDate?: string; // ISO string, optional - defaults to current time
+}
+
+export interface UpdateTrackingInfoRequest {
+  trackingNumber?: string;
+  carrier?: string;
+  trackingUrl?: string;
+  estimatedDeliveryDate?: string; // ISO string
+  notes?: string;
+}
+
 /**
  * Admin Order Management API Client
  */
@@ -91,7 +131,7 @@ export const getAdminOrders = async (
       sortDir,
     });
 
-    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/admin?${params.toString()}`);
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders?${params.toString()}`);
     const data = await handleAPIResponse(response);
 
     return {
@@ -102,7 +142,6 @@ export const getAdminOrders = async (
       pageSize: data.size || size,
     };
   } catch (error) {
-    console.error('Failed to fetch admin orders:', error);
     throw error;
   }
 };
@@ -130,7 +169,6 @@ export const getOrdersByStatus = async (
       pageSize: data.size || size,
     };
   } catch (error) {
-    console.error('Failed to fetch orders by status:', error);
     throw error;
   }
 };
@@ -159,7 +197,6 @@ export const searchAdminOrders = async (
       pageSize: data.size || size,
     };
   } catch (error) {
-    console.error('Failed to search admin orders:', error);
     throw error;
   }
 };
@@ -184,7 +221,6 @@ export const updateOrderStatus = async (
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update order status:', error);
     throw error;
   }
 };
@@ -195,7 +231,6 @@ export const getAdminOrderById = async (orderId: string): Promise<AdminOrder> =>
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/${orderId}`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch admin order:', error);
     throw error;
   }
 };
@@ -215,7 +250,6 @@ export const cancelOrder = async (orderId: string, reason: string): Promise<void
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to cancel order:', error);
     throw error;
   }
 };
@@ -233,7 +267,6 @@ export const updateOrder = async (orderId: string, orderData: Partial<AdminOrder
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to update order:', error);
     throw error;
   }
 };
@@ -247,7 +280,6 @@ export const bulkUpdateOrderStatus = async (
     const updatePromises = orderIds.map(id => updateOrderStatus(id, statusUpdate));
     await Promise.all(updatePromises);
   } catch (error) {
-    console.error('Failed to bulk update order status:', error);
     throw error;
   }
 };
@@ -267,7 +299,6 @@ export const getOrderStatistics = async (): Promise<{
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/orders/statistics`);
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Failed to fetch order statistics:', error);
     throw error;
   }
 };
@@ -320,4 +351,121 @@ export const getStatusDisplayName = (status: OrderStatus): string => {
   };
 
   return displayNames[status] || status;
+};
+
+// Tracking Management Functions
+
+// Add tracking event to an order (Admin only)
+export const addTrackingEvent = async (
+  orderId: string,
+  request: AddTrackingEventRequest
+): Promise<AdminOrder> => {
+  try {
+    const response = await makeAuthenticatedRequest(
+      `${API_BASE_URL}/orders/${orderId}/tracking`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }
+    );
+
+    return await handleAPIResponse(response);
+  } catch (error) {
+    console.error('Add tracking event error:', error);
+    throw error;
+  }
+};
+
+// Get tracking events for an order
+export const getOrderTrackingEvents = async (orderId: string): Promise<TrackingEvent[]> => {
+  try {
+    const response = await makeAuthenticatedRequest(
+      `${API_BASE_URL}/orders/${orderId}/tracking`
+    );
+
+    return await handleAPIResponse(response);
+  } catch (error) {
+    console.error('Get tracking events error:', error);
+    throw error;
+  }
+};
+
+// Update tracking information (Admin only)
+export const updateTrackingInfo = async (
+  orderId: string,
+  request: UpdateTrackingInfoRequest
+): Promise<AdminOrder> => {
+  try {
+    const response = await makeAuthenticatedRequest(
+      `${API_BASE_URL}/orders/${orderId}/tracking-info`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(request),
+      }
+    );
+
+    return await handleAPIResponse(response);
+  } catch (error) {
+    console.error('Update tracking info error:', error);
+    throw error;
+  }
+};
+
+// Delete tracking event (Admin only)
+export const deleteTrackingEvent = async (
+  orderId: string,
+  trackingEventId: string
+): Promise<void> => {
+  try {
+    const response = await makeAuthenticatedRequest(
+      `${API_BASE_URL}/orders/${orderId}/tracking/${trackingEventId}`,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    await handleAPIResponse(response);
+  } catch (error) {
+    console.error('Delete tracking event error:', error);
+    throw error;
+  }
+};
+
+// Helper functions for tracking event types
+export const getTrackingEventTypeDisplayName = (eventType: TrackingEventType): string => {
+  const displayNames: Record<TrackingEventType, string> = {
+    [TrackingEventType.ORDER_PLACED]: 'Order Placed',
+    [TrackingEventType.PAYMENT_CONFIRMED]: 'Payment Confirmed',
+    [TrackingEventType.ORDER_PROCESSING]: 'Processing',
+    [TrackingEventType.ORDER_SHIPPED]: 'Shipped',
+    [TrackingEventType.IN_TRANSIT]: 'In Transit',
+    [TrackingEventType.OUT_FOR_DELIVERY]: 'Out for Delivery',
+    [TrackingEventType.DELIVERED]: 'Delivered',
+    [TrackingEventType.DELIVERY_ATTEMPTED]: 'Delivery Attempted',
+    [TrackingEventType.RETURNED_TO_SENDER]: 'Returned to Sender',
+    [TrackingEventType.EXCEPTION]: 'Exception',
+    [TrackingEventType.CANCELLED]: 'Cancelled',
+    [TrackingEventType.REFUNDED]: 'Refunded',
+  };
+
+  return displayNames[eventType] || eventType;
+};
+
+export const getTrackingEventTypeColor = (eventType: TrackingEventType): string => {
+  const colors: Record<TrackingEventType, string> = {
+    [TrackingEventType.ORDER_PLACED]: 'blue',
+    [TrackingEventType.PAYMENT_CONFIRMED]: 'green',
+    [TrackingEventType.ORDER_PROCESSING]: 'yellow',
+    [TrackingEventType.ORDER_SHIPPED]: 'blue',
+    [TrackingEventType.IN_TRANSIT]: 'purple',
+    [TrackingEventType.OUT_FOR_DELIVERY]: 'orange',
+    [TrackingEventType.DELIVERED]: 'green',
+    [TrackingEventType.DELIVERY_ATTEMPTED]: 'orange',
+    [TrackingEventType.RETURNED_TO_SENDER]: 'red',
+    [TrackingEventType.EXCEPTION]: 'red',
+    [TrackingEventType.CANCELLED]: 'gray',
+    [TrackingEventType.REFUNDED]: 'gray',
+  };
+
+  return colors[eventType] || 'gray';
 };

@@ -44,7 +44,6 @@ export const getCompanyDetails = async (): Promise<CompanyDetails> => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching company details:', error);
     // Fallback to static configuration
     return {
       appName: companyDetails.tradeName,
@@ -84,7 +83,6 @@ export const getFormattedAddress = async (): Promise<string> => {
     }
     return await response.text();
   } catch (error) {
-    console.error('Error fetching address:', error);
     // Fallback to static configuration
     return companyDetails.address.flat + ', ' + 
            companyDetails.address.building + ', ' + 
@@ -108,7 +106,6 @@ export const getShortAddress = async (): Promise<string> => {
     }
     return await response.text();
   } catch (error) {
-    console.error('Error fetching short address:', error);
     // Fallback to static configuration
     return companyDetails.address.city + ', ' + 
            companyDetails.address.state + ' - ' + 
@@ -127,7 +124,6 @@ export const getGstDisplay = async (): Promise<string> => {
     }
     return await response.text();
   } catch (error) {
-    console.error('Error fetching GST info:', error);
     // Fallback to static configuration
     return companyDetails.gstin + ' (' + companyDetails.address.state + ')';
   }
@@ -144,7 +140,6 @@ export const getUdyamDisplay = async (): Promise<string> => {
     }
     return await response.text();
   } catch (error) {
-    console.error('Error fetching Udyam info:', error);
     // Fallback to static configuration
     return companyDetails.udyamRegistrationNumber + ' (Micro)';
   }

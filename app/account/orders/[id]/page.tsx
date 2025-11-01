@@ -47,7 +47,6 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         setOrder(orderData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load order');
-        console.error('Failed to fetch order:', err);
       } finally {
         setIsLoading(false);
       }

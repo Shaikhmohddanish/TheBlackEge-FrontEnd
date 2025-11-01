@@ -73,7 +73,6 @@ export function EnhancedShopContentInfinite() {
           size: result.size || size,
         };
       } catch (error) {
-        console.error('Failed to fetch products:', error);
         // Return empty result to prevent crashes
         return {
           content: [],
@@ -116,7 +115,6 @@ export function EnhancedShopContentInfinite() {
       const categoriesData = await getCategories();
       setCategories(categoriesData);
     } catch (error) {
-      console.error('Failed to load categories:', error);
       setCategories(['T-Shirts', 'Hoodies', 'Jackets', 'Pants', 'Accessories']);
     }
   };

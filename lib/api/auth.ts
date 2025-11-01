@@ -72,7 +72,6 @@ export const registerUser = async (userData: RegisterData): Promise<AuthResponse
     
     return result;
   } catch (error) {
-    console.error('Registration failed:', error);
     throw error;
   }
 };
@@ -99,7 +98,6 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthResp
     
     return result;
   } catch (error) {
-    console.error('Login failed:', error);
     throw error;
   }
 };
@@ -115,7 +113,7 @@ export const logoutUser = async (): Promise<void> => {
     //   method: 'POST',
     // });
   } catch (error) {
-    console.error('Logout failed:', error);
+
     // Clear tokens anyway
     tokenManager.clearTokens();
   }
@@ -123,11 +121,8 @@ export const logoutUser = async (): Promise<void> => {
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
-  const token = tokenManager.getToken();
-  const user = tokenManager.getUser();
-  
-  console.log('isAuthenticated check - token:', !!token, 'user:', !!user);
-  
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
   return !!(token && user);
 };
 
@@ -155,7 +150,7 @@ export const validatePassword = async (password: string): Promise<PasswordValida
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Password validation failed:', error);
+
     return {
       valid: false,
       strength: 0,
@@ -184,7 +179,7 @@ export const changePassword = async (passwordData: ChangePasswordData): Promise<
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Password change failed:', error);
+
     throw error;
   }
 };
@@ -206,7 +201,7 @@ export const getUserProfile = async () => {
 
     return await handleAPIResponse(response);
   } catch (error) {
-    console.error('Get profile failed:', error);
+
     throw error;
   }
 };
@@ -237,7 +232,7 @@ export const updateUserProfile = async (profileData: any) => {
     
     return result;
   } catch (error) {
-    console.error('Profile update failed:', error);
+
     throw error;
   }
 };
@@ -269,7 +264,7 @@ export const loginWithGoogle = async (googleData: GoogleAuthData): Promise<AuthR
     
     return result;
   } catch (error) {
-    console.error('Google login failed:', error);
+
     throw error;
   }
 };
@@ -296,7 +291,7 @@ export const registerWithGoogle = async (googleData: GoogleAuthData): Promise<Au
     
     return result;
   } catch (error) {
-    console.error('Google registration failed:', error);
+
     throw error;
   }
 };

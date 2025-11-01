@@ -67,7 +67,7 @@ export function EnhancedUserManagement() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const availableRoles = ['ROLE_USER', 'ROLE_ADMIN'];
+  const availableRoles = ['ROLE_CUSTOMER', 'ROLE_ADMIN'];
 
   // Load users on mount and when filters change
   useEffect(() => {
@@ -83,7 +83,6 @@ export function EnhancedUserManagement() {
       setTotalElements(response.totalElements);
       setTotalPages(response.totalPages);
     } catch (error) {
-      console.error('Failed to load users:', error);
       toast({
         title: 'Error',
         description: 'Failed to load users. Please try again.',
@@ -105,7 +104,6 @@ export function EnhancedUserManagement() {
       setSelectedUser(user);
       setIsUserDetailOpen(true);
     } catch (error) {
-      console.error('Failed to load user details:', error);
       toast({
         title: 'Error',
         description: 'Failed to load user details.',
@@ -156,7 +154,6 @@ export function EnhancedUserManagement() {
       setIsPasswordResetOpen(false);
       setPasswordResetForm({ userId: null, newPassword: '', confirmPassword: '' });
     } catch (error) {
-      console.error('Failed to reset password:', error);
       toast({
         title: 'Error',
         description: 'Failed to reset password. Please try again.',
@@ -193,7 +190,6 @@ export function EnhancedUserManagement() {
       setRoleUpdateForm({ userId: null, roles: [] });
       await loadUsers();
     } catch (error) {
-      console.error('Failed to update role:', error);
       toast({
         title: 'Error',
         description: 'Failed to update user role. Please try again.',
@@ -213,7 +209,6 @@ export function EnhancedUserManagement() {
       });
       await loadUsers();
     } catch (error) {
-      console.error('Failed to toggle user lock:', error);
       toast({
         title: 'Error',
         description: 'Failed to update user lock status.',
@@ -231,7 +226,6 @@ export function EnhancedUserManagement() {
       });
       await loadUsers();
     } catch (error) {
-      console.error('Failed to toggle user enable status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update user enable status.',
@@ -288,7 +282,6 @@ export function EnhancedUserManagement() {
       setSelectedUsers([]);
       await loadUsers();
     } catch (error) {
-      console.error(`Failed to ${action} users:`, error);
       toast({
         title: 'Error',
         description: `Failed to ${action} users. Please try again.`,

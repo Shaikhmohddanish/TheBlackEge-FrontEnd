@@ -26,7 +26,6 @@ export default function ProductPage({ params }: Props) {
         setProduct(productData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load product')
-        console.error('Failed to fetch product:', err)
       } finally {
         setIsLoading(false)
       }

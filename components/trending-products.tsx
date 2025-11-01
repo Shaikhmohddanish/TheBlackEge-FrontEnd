@@ -21,7 +21,6 @@ export function TrendingProducts() {
         const results = await getProducts(0, 8, 'createdAt', 'desc');
         setTrendingProducts(results.products || []);
       } catch (error) {
-        console.error('Failed to load trending products:', error);
         // Just set empty array without displaying errors for now, since backend is not running yet
         setTrendingProducts([]);
       } finally {
@@ -34,7 +33,6 @@ export function TrendingProducts() {
       try {
         await loadTrendingProducts();
       } catch (err) {
-        console.log('Error loading trending products:', err);
         setIsLoading(false);
       }
     };

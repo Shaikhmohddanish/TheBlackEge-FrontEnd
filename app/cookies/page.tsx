@@ -161,7 +161,6 @@ export default function CookiePolicyPage() {
 
   const saveSettings = () => {
     // In a real implementation, this would save to localStorage and update actual cookie consent
-    console.log('Cookie settings saved:', cookieSettings);
     // You would typically also reload the page or update tracking scripts here
   };
 

@@ -348,7 +348,6 @@ export function useCacheStats() {
       const storageStats = await browserStorage.getStorageStats();
       setStats(storageStats);
     } catch (error) {
-      console.error('Error fetching cache stats:', error);
     } finally {
       setLoading(false);
     }

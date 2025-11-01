@@ -59,7 +59,6 @@ export function AdvancedSearchResults({ initialQuery = '', className }: Advanced
         const availableFilters = await SearchAPI.getAvailableFilters(query);
         setSearchResult(prev => ({ ...prev, filters: availableFilters }));
       } catch (error) {
-        console.error('Failed to load filters:', error);
       }
     };
 
@@ -82,7 +81,6 @@ export function AdvancedSearchResults({ initialQuery = '', className }: Advanced
       
       setSearchResult(prev => ({ ...result, filters: prev.filters }));
     } catch (error) {
-      console.error('Search failed:', error);
       toast({
         title: 'Search failed',
         description: 'Failed to search products. Please try again.',

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Icons } from '@/components/ui/icons';
 import { useToast } from '@/hooks/use-toast';
@@ -111,15 +110,8 @@ export function PasswordChangeForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Change Password</CardTitle>
-        <CardDescription>
-          Update your password to keep your account secure
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <Alert variant="destructive">
               <Icons.x className="h-4 w-4" />
@@ -135,7 +127,7 @@ export function PasswordChangeForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword" className="text-white font-medium">Current Password</Label>
             <Input
               id="currentPassword"
               name="currentPassword"
@@ -145,11 +137,12 @@ export function PasswordChangeForm() {
               onChange={handleInputChange}
               placeholder="Enter your current password"
               disabled={isLoading}
+              className="border-gray-600 bg-gray-800/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20 rounded-lg h-12 px-4"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword" className="text-white font-medium">New Password</Label>
             <Input
               id="newPassword"
               name="newPassword"
@@ -159,12 +152,13 @@ export function PasswordChangeForm() {
               onChange={handleInputChange}
               placeholder="Enter your new password"
               disabled={isLoading}
+              className="border-gray-600 bg-gray-800/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20 rounded-lg h-12 px-4"
             />
             <PasswordStrengthMeter password={formData.newPassword} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-white font-medium">Confirm New Password</Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"
@@ -174,6 +168,7 @@ export function PasswordChangeForm() {
               onChange={handleInputChange}
               placeholder="Confirm your new password"
               disabled={isLoading}
+              className="border-gray-600 bg-gray-800/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20 rounded-lg h-12 px-4"
             />
             {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
               <div className="flex items-center gap-2 text-sm text-red-600">
@@ -189,18 +184,19 @@ export function PasswordChangeForm() {
             )}
           </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading || formData.newPassword !== formData.confirmPassword || !formData.currentPassword}
-          >
-            {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Change Password
-          </Button>
-        </CardContent>
+          <div className="pt-4">
+            <Button
+              type="submit"
+              className="w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
+              disabled={isLoading || formData.newPassword !== formData.confirmPassword || !formData.currentPassword}
+            >
+              {isLoading && (
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Change Password
+            </Button>
+          </div>
       </form>
-    </Card>
+    </div>
   );
 }

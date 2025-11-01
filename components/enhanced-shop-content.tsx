@@ -67,7 +67,6 @@ export function EnhancedShopContent() {
           setCurrentPage(results.currentPage);
           setTotalElements(results.totalElements);
         } catch (error) {
-          console.error('Search failed:', error);
           toast({
             title: 'Search failed',
             description: 'Failed to search products. Please try again.',
@@ -92,7 +91,6 @@ export function EnhancedShopContent() {
       setCurrentPage(results.currentPage);
       setTotalElements(results.totalElements);
     } catch (error) {
-      console.error('Failed to load products:', error);
       // Set empty state for graceful degradation
       setProducts([]);
       setTotalPages(0);
@@ -117,7 +115,6 @@ export function EnhancedShopContent() {
       const categoriesData = await getCategories();
       setCategories(categoriesData);
     } catch (error) {
-      console.error('Failed to load categories:', error);
       // Provide fallback categories for better UX
       setCategories(['T-Shirts', 'Hoodies', 'Jackets', 'Pants', 'Accessories']);
     }
@@ -142,7 +139,6 @@ export function EnhancedShopContent() {
       setCurrentPage(results.currentPage);
       setTotalElements(results.totalElements);
     } catch (error) {
-      console.error('Filter failed:', error);
       toast({
         title: 'Filter failed',
         description: 'Failed to apply filters. Please try again.',
